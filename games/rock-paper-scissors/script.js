@@ -1,379 +1,495 @@
-let playerScore = 0;
-let computerScore = 0;
-let drawScore = 0;
-let gameHistory = [];
-let bestOfFiveMode = false;
-let tournamentWins = [];
+// Rock Paper Scissors - Enhanced Multiplayer Game
+class RockPaperScissorsGame {
+    constructor() {
+        // Game state
+        this.gameMode = 'single'; // 'single', 'local', 'online'
+        this.currentPlayer = 1;
+        this.player1Choice = null;
+        this.player2Choice = null;
+        this.gameInProgress = false;
+        
+        // Scores
+        this.player1Score = 0;
+        this.player2Score = 0;
+        this.drawScore = 0;
+        this.gameHistory = [];
+        
+        // Online multiplayer
+        this.roomCode = null;
+        this.isHost = false;
+        this.opponentConnected = false;
+        
+        // Game choices
+        this.choices = {
+            rock: { icon: '🪨', beats: 'scissors' },
+            paper: { icon: '📄', beats: 'rock' },
+            scissors: { icon: '✂️', beats: 'paper' }
+        };
+        
+        this.init();
+    }
+    
+    init() {
+        this.loadScores();
+        this.setGameMode('single');
+        this.updateUI();
+    }
+    
+    // Game Mode Management
+    setGameMode(mode) {
+        this.gameMode = mode;
+        this.resetGame();
+        this.updateModeButtons();
+        this.updateUI();
+        
+        // Hide/show appropriate UI elements
+        document.getElementById('modeSelector').style.display = 'block';
+        document.getElementById('turnIndicator').style.display = mode === 'local' ? 'block' : 'none';
+        document.getElementById('onlineControls').style.display = mode === 'online' ? 'block' : 'none';
+        
+        // Update labels
+        if (mode === 'single') {
+            document.getElementById('player1Label').textContent = 'You';
+            document.getElementById('player2Label').textContent = 'Computer';
+            document.getElementById('gameStatus').textContent = 'Choose your move!';
+        } else if (mode === 'local') {
+            document.getElementById('player1Label').textContent = 'Player 1';
+            document.getElementById('player2Label').textContent = 'Player 2';
+            document.getElementById('gameStatus').textContent = 'Local Multiplayer Mode';
+            this.updateTurnIndicator();
+        } else if (mode === 'online') {
+            document.getElementById('player1Label').textContent = 'You';
+            document.getElementById('player2Label').textContent = 'Opponent';
+            document.getElementById('gameStatus').textContent = 'Online Multiplayer Mode';
+        }
+    }
+    
+    updateModeButtons() {
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[onclick="setGameMode('${this.gameMode}')"]`).classList.add('active');
+    }
+    
+    // Choice handling
+    makeChoice(choice) {
+        if (this.gameMode === 'single') {
+            this.playSinglePlayer(choice);
+        } else if (this.gameMode === 'local') {
+            this.playLocalMultiplayer(choice);
+        } else if (this.gameMode === 'online') {
+            this.playOnlineMultiplayer(choice);
+        }
+    }
+    
+    // Single Player Mode (vs Computer)
+    playSinglePlayer(playerChoice) {
+        const computerChoice = this.getComputerChoice();
+        
+        this.player1Choice = playerChoice;
+        this.player2Choice = computerChoice;
+        
+        this.showChoices();
+        this.determineWinner();
+        this.updateScores();
+        this.addToHistory();
+        this.saveScores();
+        
+        setTimeout(() => this.resetRound(), 3000);
+    }
+    
+    // Local Multiplayer Mode
+    playLocalMultiplayer(choice) {
+        if (this.gameInProgress) return;
+        
+        if (this.currentPlayer === 1) {
+            this.player1Choice = choice;
+            this.currentPlayer = 2;
+            this.updateTurnIndicator();
+            this.showPlayerChoice(1, choice, true); // Hide choice initially
+            
+        } else if (this.currentPlayer === 2) {
+            this.player2Choice = choice;
+            this.gameInProgress = true;
+            
+            // Reveal both choices
+            this.showChoices();
+            this.determineWinner();
+            this.updateScores();
+            this.addToHistory();
+            this.saveScores();
+            
+            setTimeout(() => this.resetRound(), 3000);
+        }
+    }
+    
+    // Online Multiplayer Mode
+    playOnlineMultiplayer(choice) {
+        if (!this.opponentConnected) {
+            this.updateGameStatus('Waiting for opponent to connect...');
+            return;
+        }
+        
+        this.player1Choice = choice;
+        this.showPlayerChoice(1, choice);
+        this.updatePlayerStatus(1, 'Choice made - waiting for opponent...');
+        
+        // Send choice to opponent (simulated)
+        this.sendChoiceToOpponent(choice);
+        
+        // Disable choices until opponent responds
+        this.disableChoices();
+    }
+    
+    // Computer AI
+    getComputerChoice() {
+        const choiceKeys = Object.keys(this.choices);
+        return choiceKeys[Math.floor(Math.random() * choiceKeys.length)];
+    }
+    
+    // Game Logic
+    determineWinner() {
+        if (this.player1Choice === this.player2Choice) {
+            this.gameResult = 'draw';
+            this.updateGameStatus("It's a draw!");
+        } else if (this.choices[this.player1Choice].beats === this.player2Choice) {
+            this.gameResult = 'player1';
+            const p1Name = this.gameMode === 'single' ? 'You' : 'Player 1';
+            this.updateGameStatus(`${p1Name} wins!`);
+            this.updatePlayerStatus(1, 'Winner! 🏆');
+        } else {
+            this.gameResult = 'player2';
+            const p2Name = this.gameMode === 'single' ? 'Computer' : 
+                          this.gameMode === 'local' ? 'Player 2' : 'Opponent';
+            this.updateGameStatus(`${p2Name} wins!`);
+            this.updatePlayerStatus(2, 'Winner! 🏆');
+        }
+    }
+    
+    updateScores() {
+        if (this.gameResult === 'player1') {
+            this.player1Score++;
+        } else if (this.gameResult === 'player2') {
+            this.player2Score++;
+        } else {
+            this.drawScore++;
+        }
+        this.updateScoreDisplay();
+    }
+    
+    // UI Updates
+    updateUI() {
+        this.updateScoreDisplay();
+        this.updateGameStatus('Choose your move!');
+        this.resetChoiceDisplays();
+        this.clearPlayerStatuses();
+    }
+    
+    updateScoreDisplay() {
+        document.getElementById('player1Score').textContent = this.player1Score;
+        document.getElementById('player2Score').textContent = this.player2Score;
+        document.getElementById('drawScore').textContent = this.drawScore;
+    }
+    
+    updateGameStatus(message) {
+        document.getElementById('gameStatus').textContent = message;
+    }
+    
+    updateTurnIndicator() {
+        if (this.gameMode !== 'local') return;
+        
+        const turnText = document.getElementById('turnText');
+        const turnInstruction = document.getElementById('turnInstruction');
+        
+        if (this.currentPlayer === 1) {
+            turnText.textContent = "Player 1's Turn";
+            turnInstruction.textContent = "Make your choice, then pass to Player 2";
+        } else {
+            turnText.textContent = "Player 2's Turn";
+            turnInstruction.textContent = "Make your choice to see the results";
+        }
+    }
+    
+    updatePlayerStatus(player, status) {
+        document.getElementById(`player${player}Status`).textContent = status;
+    }
+    
+    clearPlayerStatuses() {
+        document.getElementById('player1Status').textContent = '';
+        document.getElementById('player2Status').textContent = '';
+    }
+    
+    showChoices() {
+        this.showPlayerChoice(1, this.player1Choice);
+        this.showPlayerChoice(2, this.player2Choice);
+    }
+    
+    showPlayerChoice(player, choice, hidden = false) {
+        const choiceElement = document.getElementById(`player${player}Choice`);
+        if (hidden) {
+            choiceElement.textContent = '🤫'; // Hidden choice
+        } else {
+            choiceElement.textContent = this.choices[choice].icon;
+        }
+        
+        // Add animation
+        choiceElement.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+            choiceElement.style.transform = 'scale(1)';
+        }, 300);
+    }
+    
+    resetChoiceDisplays() {
+        document.getElementById('player1Choice').textContent = '❓';
+        document.getElementById('player2Choice').textContent = '❓';
+    }
+    
+    resetRound() {
+        this.player1Choice = null;
+        this.player2Choice = null;
+        this.gameInProgress = false;
+        this.currentPlayer = 1;
+        
+        this.resetChoiceDisplays();
+        this.clearPlayerStatuses();
+        this.enableChoices();
+        
+        if (this.gameMode === 'local') {
+            this.updateTurnIndicator();
+            document.getElementById('gameStatus').textContent = 'Next Round - Player 1 goes first';
+        } else {
+            document.getElementById('gameStatus').textContent = 'Choose your move!';
+        }
+    }
+    
+    resetGame() {
+        this.resetRound();
+        this.updateUI();
+    }
+    
+    disableChoices() {
+        document.getElementById('choiceButtons').classList.add('disabled');
+    }
+    
+    enableChoices() {
+        document.getElementById('choiceButtons').classList.remove('disabled');
+    }
+    
+    // Score Management
+    resetScores() {
+        this.player1Score = 0;
+        this.player2Score = 0;
+        this.drawScore = 0;
+        this.gameHistory = [];
+        this.updateScoreDisplay();
+        this.saveScores();
+        this.updateHistoryDisplay();
+        this.updateGameStatus('Scores reset! Choose your move!');
+    }
+    
+    loadScores() {
+        const saved = localStorage.getItem('rpsScores');
+        if (saved) {
+            const scores = JSON.parse(saved);
+            this.player1Score = scores.player1 || 0;
+            this.player2Score = scores.player2 || 0;
+            this.drawScore = scores.draw || 0;
+        }
+        
+        const savedHistory = localStorage.getItem('rpsHistory');
+        if (savedHistory) {
+            this.gameHistory = JSON.parse(savedHistory);
+            this.updateHistoryDisplay();
+        }
+    }
+    
+    saveScores() {
+        localStorage.setItem('rpsScores', JSON.stringify({
+            player1: this.player1Score,
+            player2: this.player2Score,
+            draw: this.drawScore
+        }));
+        localStorage.setItem('rpsHistory', JSON.stringify(this.gameHistory));
+    }
+    
+    addToHistory() {
+        const gameRecord = {
+            player1: this.player1Choice,
+            player2: this.player2Choice,
+            result: this.gameResult,
+            timestamp: new Date().toISOString(),
+            mode: this.gameMode
+        };
+        
+        this.gameHistory.unshift(gameRecord);
+        if (this.gameHistory.length > 10) {
+            this.gameHistory = this.gameHistory.slice(0, 10);
+        }
+        
+        this.updateHistoryDisplay();
+    }
+    
+    updateHistoryDisplay() {
+        const historyList = document.getElementById('historyList');
+        if (!historyList) return;
+        
+        historyList.innerHTML = '';
+        
+        this.gameHistory.forEach(game => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            
+            const resultText = game.result === 'draw' ? 'Draw' :
+                             game.result === 'player1' ? 'P1 Wins' : 'P2 Wins';
+            
+            historyItem.innerHTML = `
+                <span>${this.choices[game.player1].icon} vs ${this.choices[game.player2].icon}</span>
+                <span class="result ${game.result}">${resultText}</span>
+                <span class="mode">${game.mode}</span>
+            `;
+            
+            historyList.appendChild(historyItem);
+        });
+    }
+    
+    // Tournament Mode
+    playBestOfFive() {
+        alert('Best of 5 tournament mode! First to win 3 games wins the tournament.');
+    }
+    
+    // Online Multiplayer Functions
+    createRoom() {
+        this.roomCode = this.generateRoomCode();
+        this.isHost = true;
+        
+        document.getElementById('roomSection').style.display = 'none';
+        document.getElementById('roomInfo').style.display = 'block';
+        document.getElementById('currentRoomCode').textContent = this.roomCode;
+        document.getElementById('connectionStatus').textContent = 'Waiting for opponent to join...';
+        
+        // Simulate room creation
+        setTimeout(() => {
+            this.simulateOpponentJoin();
+        }, 3000);
+    }
+    
+    joinRoom() {
+        const roomCode = document.getElementById('roomCode').value.toUpperCase();
+        if (roomCode.length !== 6) {
+            alert('Please enter a valid 6-character room code');
+            return;
+        }
+        
+        this.roomCode = roomCode;
+        this.isHost = false;
+        
+        document.getElementById('roomSection').style.display = 'none';
+        document.getElementById('roomInfo').style.display = 'block';
+        document.getElementById('currentRoomCode').textContent = this.roomCode;
+        document.getElementById('connectionStatus').textContent = 'Connecting to opponent...';
+        
+        // Simulate joining room
+        setTimeout(() => {
+            this.simulateOpponentConnection();
+        }, 2000);
+    }
+    
+    leaveRoom() {
+        this.roomCode = null;
+        this.isHost = false;
+        this.opponentConnected = false;
+        
+        document.getElementById('roomSection').style.display = 'block';
+        document.getElementById('roomInfo').style.display = 'none';
+        document.getElementById('roomCode').value = '';
+        
+        this.updateGameStatus('Online Multiplayer Mode - Create or join a room');
+    }
+    
+    generateRoomCode() {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+    
+    simulateOpponentJoin() {
+        this.opponentConnected = true;
+        document.getElementById('connectionStatus').textContent = 'Opponent connected! Game ready.';
+        this.updateGameStatus('Opponent connected! Make your choice.');
+    }
+    
+    simulateOpponentConnection() {
+        this.opponentConnected = true;
+        document.getElementById('connectionStatus').textContent = 'Connected to opponent! Game ready.';
+        this.updateGameStatus('Connected to opponent! Make your choice.');
+    }
+    
+    sendChoiceToOpponent(choice) {
+        // In a real implementation, this would send data to Firebase/backend
+        console.log(`Sending choice to opponent: ${choice}`);
+        
+        // Simulate opponent response
+        setTimeout(() => {
+            const opponentChoice = this.getComputerChoice();
+            this.receiveOpponentChoice(opponentChoice);
+        }, 1000 + Math.random() * 2000);
+    }
+    
+    receiveOpponentChoice(choice) {
+        this.player2Choice = choice;
+        this.showPlayerChoice(2, choice);
+        this.updatePlayerStatus(2, 'Choice received!');
+        
+        this.determineWinner();
+        this.updateScores();
+        this.addToHistory();
+        this.saveScores();
+        
+        setTimeout(() => this.resetRound(), 3000);
+    }
+}
 
-const choices = {
-    rock: { icon: '🪨', beats: 'scissors' },
-    paper: { icon: '📄', beats: 'rock' },
-    scissors: { icon: '✂️', beats: 'paper' }
-};
+// Global game instance
+let game;
 
+// Global functions for HTML onclick events
 function goHome() {
     window.location.href = '../../index.html';
 }
 
-function loadScores() {
-    const saved = localStorage.getItem('rpsScores');
-    if (saved) {
-        const scores = JSON.parse(saved);
-        playerScore = scores.player || 0;
-        computerScore = scores.computer || 0;
-        drawScore = scores.draw || 0;
-        updateScoreDisplay();
-    }
-    
-    const savedHistory = localStorage.getItem('rpsHistory');
-    if (savedHistory) {
-        gameHistory = JSON.parse(savedHistory);
-        updateHistoryDisplay();
-    }
+function setGameMode(mode) {
+    game.setGameMode(mode);
 }
 
-function saveScores() {
-    localStorage.setItem('rpsScores', JSON.stringify({
-        player: playerScore,
-        computer: computerScore,
-        draw: drawScore
-    }));
-    localStorage.setItem('rpsHistory', JSON.stringify(gameHistory));
-}
-
-function updateScoreDisplay() {
-    document.getElementById('playerScore').textContent = playerScore;
-    document.getElementById('computerScore').textContent = computerScore;
-    document.getElementById('drawScore').textContent = drawScore;
-}
-
-function getComputerChoice() {
-    const choiceKeys = Object.keys(choices);
-    return choiceKeys[Math.floor(Math.random() * choiceKeys.length)];
-}
-
-function determineWinner(playerChoice, computerChoice) {
-    if (playerChoice === computerChoice) {
-        return 'draw';
-    }
-    return choices[playerChoice].beats === computerChoice ? 'player' : 'computer';
-}
-
-function playGame(playerChoice) {
-    if (bestOfFiveMode && tournamentWins.length >= 5) {
-        return; // Tournament is complete
-    }
-    
-    const computerChoice = getComputerChoice();
-    const result = determineWinner(playerChoice, computerChoice);
-    
-    // Update displays
-    document.getElementById('playerChoice').textContent = choices[playerChoice].icon;
-    document.getElementById('computerChoice').textContent = choices[computerChoice].icon;
-    
-    // Add visual feedback
-    const playerDisplay = document.getElementById('playerChoice');
-    const computerDisplay = document.getElementById('computerChoice');
-    
-    // Reset classes
-    playerDisplay.className = 'choice-display';
-    computerDisplay.className = 'choice-display';
-    
-    // Add result classes
-    setTimeout(() => {
-        if (result === 'player') {
-            playerDisplay.classList.add('winner');
-            computerDisplay.classList.add('loser');
-        } else if (result === 'computer') {
-            playerDisplay.classList.add('loser');
-            computerDisplay.classList.add('winner');
-        } else {
-            playerDisplay.classList.add('draw');
-            computerDisplay.classList.add('draw');
-        }
-    }, 100);
-    
-    // Update scores and status
-    let statusMessage = '';
-    if (result === 'player') {
-        playerScore++;
-        statusMessage = `You win! ${choices[playerChoice].icon} beats ${choices[computerChoice].icon}`;
-        // Check for milestone achievements only if not in tournament mode
-        if (!bestOfFiveMode) {
-            // Wait for UI updates to complete before checking milestones
-            setTimeout(() => {
-                checkMilestoneAchievements();
-            }, 1500);
-        }
-    } else if (result === 'computer') {
-        computerScore++;
-        statusMessage = `Computer wins! ${choices[computerChoice].icon} beats ${choices[playerChoice].icon}`;
-    } else {
-        drawScore++;
-        statusMessage = `It's a draw! Both chose ${choices[playerChoice].icon}`;
-    }
-    
-    document.getElementById('gameStatus').textContent = statusMessage;
-    updateScoreDisplay();
-    
-    // Add to history
-    const historyItem = {
-        player: playerChoice,
-        computer: computerChoice,
-        result: result,
-        timestamp: new Date().toLocaleTimeString()
-    };
-    gameHistory.unshift(historyItem);
-    
-    // Keep only last 10 games in history
-    if (gameHistory.length > 10) {
-        gameHistory = gameHistory.slice(0, 10);
-    }
-    
-    updateHistoryDisplay();
-    saveScores();
-    
-    // Handle Best of Five mode
-    if (bestOfFiveMode) {
-        handleTournamentRound(result);
-    }
-}
-
-function handleTournamentRound(result) {
-    tournamentWins.push(result);
-    updateTournamentDisplay();
-    
-    // Check if tournament is complete
-    const playerWins = tournamentWins.filter(r => r === 'player').length;
-    const computerWins = tournamentWins.filter(r => r === 'computer').length;
-    
-    if (playerWins === 3) {
-        endTournament('You won the Best of 5! 🎉');
-    } else if (computerWins === 3) {
-        endTournament('Computer won the Best of 5! 😔');
-    } else if (tournamentWins.length === 5) {
-        if (playerWins > computerWins) {
-            endTournament('You won the Best of 5! 🎉');
-        } else if (computerWins > playerWins) {
-            endTournament('Computer won the Best of 5! 😔');
-        } else {
-            endTournament('Best of 5 ended in a tie! 🤝');
-        }
-    }
-}
-
-function updateTournamentDisplay() {
-    const progressDiv = document.querySelector('.tournament-progress');
-    if (!progressDiv) return;
-    
-    progressDiv.innerHTML = '';
-    
-    for (let i = 0; i < 5; i++) {
-        const indicator = document.createElement('div');
-        indicator.className = 'round-indicator';
-        
-        if (i < tournamentWins.length) {
-            const result = tournamentWins[i];
-            indicator.classList.add(result === 'player' ? 'win' : result === 'computer' ? 'lose' : 'draw');
-            indicator.textContent = result === 'player' ? '✓' : result === 'computer' ? '✗' : '=';
-        } else {
-            indicator.textContent = i + 1;
-        }
-        
-        progressDiv.appendChild(indicator);
-    }
-}
-
-function endTournament(message) {
-    document.getElementById('gameStatus').textContent = message;
-    
-    // Check for leaderboard qualification after tournament
-    const playerWins = tournamentWins.filter(r => r === 'player').length;
-    const computerWins = tournamentWins.filter(r => r === 'computer').length;
-    
-    if (playerWins >= 3) {
-        // Player won the tournament - add to leaderboard
-        const score = playerScore; // Use total career wins as score
-        const totalGames = playerScore + computerScore;
-        const winRatio = totalGames > 0 ? ((playerScore / totalGames) * 100).toFixed(1) + '%' : '0%';
-        
-        const gameDetails = {
-            tournament_result: 'Won Best of 5',
-            career_wins: playerScore,
-            career_losses: computerScore,
-            win_ratio: winRatio
-        };
-        
-        // Only show leaderboard if player has a decent score (at least 3 wins)
-        if (window.gameLeaderboard && playerScore >= 3 && window.gameLeaderboard.qualifiesForLeaderboard('rock-paper-scissors', score)) {
-            setTimeout(() => {
-                window.gameLeaderboard.showNameInput('rock-paper-scissors', score, gameDetails, 'high')
-                    .then(result => {
-                        if (result.submitted) {
-                            document.getElementById('gameStatus').textContent = 
-                                `${message} 🏆 Added to leaderboard as ${result.playerName}!`;
-                        }
-                    });
-            }, 1000);
-        }
-    }
-    
-    setTimeout(() => {
-        bestOfFiveMode = false;
-        tournamentWins = [];
-        const tournamentDiv = document.querySelector('.best-of-five');
-        if (tournamentDiv) {
-            tournamentDiv.remove();
-        }
-    }, 3000);
-}
-
-function playBestOfFive() {
-    if (bestOfFiveMode) return;
-    
-    bestOfFiveMode = true;
-    tournamentWins = [];
-    
-    const tournamentDiv = document.createElement('div');
-    tournamentDiv.className = 'best-of-five';
-    tournamentDiv.innerHTML = `
-        <h3>Best of 5 Tournament</h3>
-        <p>First to win 3 rounds wins the tournament!</p>
-        <div class="tournament-progress"></div>
-    `;
-    
-    document.querySelector('.game-area').insertBefore(
-        tournamentDiv, 
-        document.querySelector('.choices')
-    );
-    
-    updateTournamentDisplay();
-    document.getElementById('gameStatus').textContent = 'Best of 5 started! Make your first move!';
-}
-
-function updateHistoryDisplay() {
-    const historyList = document.getElementById('historyList');
-    
-    if (gameHistory.length === 0) {
-        historyList.innerHTML = '<div class="history-item">No games played yet</div>';
-        return;
-    }
-    
-    historyList.innerHTML = gameHistory.map(game => {
-        const playerIcon = choices[game.player].icon;
-        const computerIcon = choices[game.computer].icon;
-        let resultText = '';
-        let resultClass = '';
-        
-        if (game.result === 'player') {
-            resultText = 'You won';
-            resultClass = 'win';
-        } else if (game.result === 'computer') {
-            resultText = 'Computer won';
-            resultClass = 'lose';
-        } else {
-            resultText = 'Draw';
-            resultClass = 'draw';
-        }
-        
-        return `
-            <div class="history-item ${resultClass}">
-                ${game.timestamp}: ${playerIcon} vs ${computerIcon} - ${resultText}
-            </div>
-        `;
-    }).join('');
+function makeChoice(choice) {
+    game.makeChoice(choice);
 }
 
 function resetScores() {
-    playerScore = 0;
-    computerScore = 0;
-    drawScore = 0;
-    gameHistory = [];
-    
-    // Reset milestone tracking
-    localStorage.removeItem('rps_lastMilestone');
-    
-    updateScoreDisplay();
-    updateHistoryDisplay();
-    saveScores();
-    
-    document.getElementById('gameStatus').textContent = 'Scores reset! Choose your move!';
-    document.getElementById('playerChoice').textContent = '❓';
-    document.getElementById('computerChoice').textContent = '❓';
-    
-    // Reset display classes
-    document.getElementById('playerChoice').className = 'choice-display';
-    document.getElementById('computerChoice').className = 'choice-display';
+    game.resetScores();
 }
 
-// Show leaderboard for this game
+function playBestOfFive() {
+    game.playBestOfFive();
+}
+
+function createRoom() {
+    game.createRoom();
+}
+
+function joinRoom() {
+    game.joinRoom();
+}
+
+function leaveRoom() {
+    game.leaveRoom();
+}
+
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('rock-paper-scissors');
+    if (typeof leaderboard !== 'undefined') {
+        leaderboard.showLeaderboard('rock-paper-scissors');
     }
 }
 
-// Check for milestone achievements
-function checkMilestoneAchievements() {
-    const milestones = [5, 10, 25, 50, 100, 250, 500];
-    
-    // Find the highest milestone reached
-    let achievedMilestone = null;
-    for (let i = milestones.length - 1; i >= 0; i--) {
-        if (playerScore >= milestones[i]) {
-            achievedMilestone = milestones[i];
-            break;
-        }
-    }
-    
-    // Check if this is a new milestone (not previously achieved)
-    const lastMilestone = parseInt(localStorage.getItem('rps_lastMilestone')) || 0;
-    
-    if (achievedMilestone && achievedMilestone > lastMilestone) {
-        // Save the new milestone
-        localStorage.setItem('rps_lastMilestone', achievedMilestone.toString());
-        
-        const totalGames = playerScore + computerScore;
-        const winRatio = totalGames > 0 ? ((playerScore / totalGames) * 100).toFixed(1) + '%' : '0%';
-        
-        const gameDetails = {
-            milestone: `${achievedMilestone} wins milestone reached!`,
-            career_wins: playerScore,
-            career_losses: computerScore,
-            win_ratio: winRatio,
-            total_games: totalGames
-        };
-        
-        // Only show leaderboard for meaningful milestones (5+ wins)
-        if (window.gameLeaderboard && achievedMilestone >= 5 && window.gameLeaderboard.qualifiesForLeaderboard('rock-paper-scissors', playerScore)) {
-            // Delay to avoid conflicts with game UI updates
-            setTimeout(() => {
-                window.gameLeaderboard.showNameInput('rock-paper-scissors', playerScore, gameDetails, 'high')
-                    .then(result => {
-                        if (result.submitted) {
-                            setTimeout(() => {
-                                document.getElementById('gameStatus').textContent = 
-                                    `🏆 ${achievedMilestone} wins milestone! Added to leaderboard as ${result.playerName}!`;
-                            }, 500);
-                        }
-                    });
-            }, 1500);
-        }
-    }
-}
-
-// Initialize the game
-document.addEventListener('DOMContentLoaded', function() {
-    loadScores();
-    
-    // Add button hover effects
-    document.querySelectorAll('.choice-btn').forEach(btn => {
-        btn.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px) scale(1.05)';
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
-    });
+// Initialize game when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    game = new RockPaperScissorsGame();
 });
