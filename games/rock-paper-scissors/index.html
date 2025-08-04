@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Game Hub</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/leaderboard.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-container">
+            <button class="back-button" onclick="goHome()">← Back to Games</button>
+            
+            <div class="game-header">
+                <h1>✂️ Rock Paper Scissors</h1>
+                <div class="score-board">
+                    <div>You: <span id="playerScore">0</span></div>
+                    <div>Computer: <span id="computerScore">0</span></div>
+                    <div>Draws: <span id="drawScore">0</span></div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="game-status">
+                    <h2 id="gameStatus">Choose your move!</h2>
+                </div>
+                
+                <div class="battle-arena">
+                    <div class="player-section">
+                        <h3>You</h3>
+                        <div class="choice-display" id="playerChoice">❓</div>
+                    </div>
+                    
+                    <div class="vs-section">
+                        <div class="vs-text">VS</div>
+                    </div>
+                    
+                    <div class="computer-section">
+                        <h3>Computer</h3>
+                        <div class="choice-display" id="computerChoice">❓</div>
+                    </div>
+                </div>
+                
+                <div class="choices">
+                    <button class="choice-btn" data-choice="rock" onclick="playGame('rock')">
+                        <span class="choice-icon">🪨</span>
+                        <span class="choice-label">Rock</span>
+                    </button>
+                    <button class="choice-btn" data-choice="paper" onclick="playGame('paper')">
+                        <span class="choice-icon">📄</span>
+                        <span class="choice-label">Paper</span>
+                    </button>
+                    <button class="choice-btn" data-choice="scissors" onclick="playGame('scissors')">
+                        <span class="choice-icon">✂️</span>
+                        <span class="choice-label">Scissors</span>
+                    </button>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="game-button" onclick="resetScores()">Reset Scores</button>
+                    <button class="game-button" onclick="playBestOfFive()">Best of 5</button>
+                    <button class="leaderboard-button" onclick="showGameLeaderboard()">🏆 Leaderboard</button>
+                </div>
+                
+                <div class="game-history" id="gameHistory">
+                    <h3>Recent Games</h3>
+                    <div class="history-list" id="historyList">
+                        <!-- Game history will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/leaderboard.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

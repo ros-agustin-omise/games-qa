@@ -1,0 +1,336 @@
+/* Leaderboard Modal Styles */
+.leaderboard-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: modal-fade-in 0.3s ease-out;
+}
+
+.leaderboard-modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    animation: modal-slide-up 0.3s ease-out;
+}
+
+.leaderboard-modal-content.large {
+    max-width: 700px;
+}
+
+@keyframes modal-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modal-slide-up {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.leaderboard-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.leaderboard-header h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.leaderboard-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.score-display {
+    text-align: center;
+    margin: 25px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    color: white;
+}
+
+.score-value {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.score-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    text-transform: capitalize;
+}
+
+.name-input-section {
+    margin: 25px 0;
+}
+
+.name-input-section label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.name-input-section input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.name-input-section input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.modal-btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.modal-btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.modal-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.modal-btn.secondary {
+    background: #f8f9fa;
+    color: #666;
+    border: 2px solid #ddd;
+}
+
+.modal-btn.secondary:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* Leaderboard List Styles */
+.leaderboard-list {
+    margin: 20px 0;
+}
+
+.leaderboard-entry {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin: 10px 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.leaderboard-entry:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.leaderboard-entry.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border-color: #f39c12;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.leaderboard-entry.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+    border-color: #95a5a6;
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.3);
+}
+
+.leaderboard-entry.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+    border-color: #d68910;
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
+}
+
+.leaderboard-entry.current-player {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
+.rank {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    min-width: 60px;
+}
+
+.rank-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 10px;
+    color: #333;
+}
+
+.player-info {
+    flex: 1;
+}
+
+.player-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.score-details {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.score {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-left: 20px;
+}
+
+.empty-leaderboard {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+    font-size: 1.2rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px dashed #ddd;
+}
+
+/* Leaderboard Button */
+.leaderboard-button {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #333;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 5px;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
+}
+
+.leaderboard-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+.leaderboard-button:active {
+    transform: translateY(0);
+}
+
+/* Game Selector */
+.game-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.game-selector-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.game-selector-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.game-selector-btn:active {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .leaderboard-modal-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .leaderboard-modal-content.large {
+        max-width: 95%;
+    }
+    
+    .score-value {
+        font-size: 2.5rem;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .leaderboard-entry {
+        padding: 12px;
+    }
+    
+    .rank {
+        min-width: 50px;
+        margin-right: 15px;
+    }
+    
+    .rank-number {
+        font-size: 1.3rem;
+    }
+    
+    .player-name {
+        font-size: 1.1rem;
+    }
+    
+    .score {
+        font-size: 1.5rem;
+        margin-left: 10px;
+    }
+    
+    .score-details {
+        font-size: 0.8rem;
+    }
+}

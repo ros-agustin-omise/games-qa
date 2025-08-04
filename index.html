@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playverse - Choose your adventure and dive in!</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/leaderboard.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <img src="puzzle.gif" alt="Puzzle Animation" class="puzzle-gif" />
+                Playverse
+            </h1>
+            <p>Choose your adventure and dive in!</p>
+        </header>
+
+        <main class="games-grid">
+            <div class="game-card" onclick="openGame('spot-the-difference')">
+                <div class="game-icon">🕵️</div>
+                <h3>Spot the Difference</h3>
+                <p>Find differences between images</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('memory-match')">
+                <div class="game-icon">🎴</div>
+                <h3>Memory Match</h3>
+                <p>Find matching pairs</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('rock-paper-scissors')">
+                <div class="game-icon">✊</div>
+                <h3>Rock Paper Scissors</h3>
+                <p>Classic hand game vs computer</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('number-guessing')">
+                <div class="game-icon">🎯</div>
+                <h3>Number Guessing</h3>
+                <p>Guess the secret number</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('word-scramble')">
+                <div class="game-icon">🔤</div>
+                <h3>Word Scramble</h3>
+                <p>Unscramble the letters</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('test-case-designer')">
+                <div class="game-icon">🧪</div>
+                <h3>Test Case Designer</h3>
+                <p>Create comprehensive test cases</p>
+            </div>
+        </main>
+
+        <div class="hub-controls">
+            <button class="leaderboard-button" onclick="showAllLeaderboards()">🏆 View Leaderboards</button>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Ros.A - Built with HTML, CSS & JavaScript</p>
+        </footer>
+    </div>
+
+    <script src="js/leaderboard.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

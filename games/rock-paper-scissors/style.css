@@ -1,0 +1,269 @@
+.game-status h2 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+}
+
+.score-board {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.score-board div {
+    font-weight: bold;
+    color: #333;
+}
+
+.battle-arena {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+    gap: 30px;
+}
+
+.player-section, .computer-section {
+    text-align: center;
+    flex: 1;
+    max-width: 150px;
+}
+
+.player-section h3, .computer-section h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.choice-display {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.choice-display.winner {
+    border-color: #2ecc71;
+    background: #d5f4e6;
+    animation: winner-pulse 1s ease-in-out;
+}
+
+.choice-display.loser {
+    border-color: #e74c3c;
+    background: #fdeaea;
+}
+
+.choice-display.draw {
+    border-color: #f39c12;
+    background: #fef5e7;
+}
+
+@keyframes winner-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.vs-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs-text {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #667eea;
+    padding: 20px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.choices {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.choice-btn {
+    background: white;
+    border: 3px solid #ddd;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 100px;
+}
+
+.choice-btn:hover {
+    border-color: #16225b;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.choice-btn:active {
+    transform: translateY(-2px);
+}
+
+.choice-icon {
+    font-size: 2.5rem;
+}
+
+.choice-label {
+    font-weight: bold;
+    color: #333;
+    font-size: 1rem;
+}
+
+.choice-btn.selected {
+    border-color: #16225b;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.game-controls {
+    margin: 30px 0;
+    text-align: center;
+}
+
+.game-button {
+    background: #16225b;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 0 10px;
+    transition: background 0.3s ease;
+}
+
+.game-button:hover {
+    background: #5a6fd8;
+}
+
+.game-history {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.game-history h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.history-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.history-item.win {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.history-item.lose {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.history-item.draw {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+.best-of-five {
+    background: #2ecc71;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.best-of-five h3 {
+    margin-bottom: 10px;
+}
+
+.tournament-progress {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.round-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.round-indicator.win {
+    background: #27ae60;
+}
+
+.round-indicator.lose {
+    background: #c0392b;
+}
+
+.round-indicator.draw {
+    background: #e67e22;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .battle-arena {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .vs-section {
+        order: -1;
+    }
+    
+    .choices {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .choice-btn {
+        flex-direction: row;
+        min-width: 200px;
+        padding: 15px;
+    }
+    
+    .score-board {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

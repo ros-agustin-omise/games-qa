@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Case Designer - Playverse</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/leaderboard.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-container">
+            <div class="game-header">
+                <button class="back-button" onclick="window.location.href='../../index.html'">← Back to Hub</button>
+                <h1>🧪 Test Case Designer</h1>
+                <p>Design comprehensive test cases for software features</p>
+            </div>
+
+            <!-- Game Selection Screen -->
+            <div class="game-area" id="gameSelection">
+                <div class="difficulty-selector">
+                    <h3>Choose Your Challenge Level:</h3>
+                    <div class="difficulty-options">
+                        <button class="difficulty-btn" onclick="startGame('beginner')">
+                            <div class="difficulty-icon">🟢</div>
+                            <h4>Beginner</h4>
+                            <p>Simple UI components</p>
+                            <small>Login forms, buttons, inputs</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="startGame('intermediate')">
+                            <div class="difficulty-icon">🟡</div>
+                            <h4>Intermediate</h4>
+                            <p>Complex workflows</p>
+                            <small>E-commerce, user registration</small>
+                        </button>
+                        <button class="difficulty-btn" onclick="startGame('advanced')">
+                            <div class="difficulty-icon">🔴</div>
+                            <h4>Advanced</h4>
+                            <p>Critical systems</p>
+                            <small>Payment processing, APIs</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Play Screen -->
+            <div class="game-area hidden" id="gamePlay">
+                <div class="game-controls">
+                    <div class="score-display">
+                        <span class="score-label">Score:</span>
+                        <span class="score-value" id="scoreValue">0</span>
+                    </div>
+                    <div class="feature-counter">
+                        <span class="feature-label">Feature:</span>
+                        <span class="feature-value" id="featureValue">1/5</span>
+                    </div>
+                    <div class="coverage-meter">
+                        <span class="coverage-label">Test Quality:</span>
+                        <div class="coverage-bar">
+                            <div class="coverage-fill" id="coverageFill"></div>
+                        </div>
+                        <div>
+                            <span class="coverage-percent" id="coveragePercent">0%</span>
+                            <div class="coverage-quality-label" id="coverageQuality">Starting...</div>
+                        </div>
+                        <div class="coverage-tooltip" id="coverageTooltip">
+                            <div>Essential Tests: <span id="tooltipEssential">0%</span></div>
+                            <div>Category Balance: <span id="tooltipBalance">0%</span></div>
+                            <div>Selection Efficiency: <span id="tooltipEfficiency">100%</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-description">
+                    <h3 id="featureTitle">Feature to Test</h3>
+                    <div class="feature-details" id="featureDetails">
+                        <!-- Feature requirements will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="test-case-section">
+                    <h4>Design Your Test Cases:</h4>
+                    
+                    <!-- Category Navigation -->
+                    <div class="category-navigation">
+                        <button class="category-nav-btn active" onclick="showCategory(0)">✅ Positive</button>
+                        <button class="category-nav-btn" onclick="showCategory(1)">❌ Negative</button>
+                        <button class="category-nav-btn" onclick="showCategory(2)">🎯 Boundary</button>
+                        <button class="category-nav-btn" onclick="showCategory(3)">🔒 Security</button>
+                    </div>
+                    
+                    <!-- Progress Indicators -->
+                    <div class="category-indicators">
+                        <div class="category-indicator active" onclick="showCategory(0)"></div>
+                        <div class="category-indicator" onclick="showCategory(1)"></div>
+                        <div class="category-indicator" onclick="showCategory(2)"></div>
+                        <div class="category-indicator" onclick="showCategory(3)"></div>
+                    </div>
+                    
+                    <!-- Swipable Categories -->
+                    <div class="test-categories-wrapper">
+                        <div class="test-categories" id="testCategoriesContainer">
+                            <div class="category-section active">
+                                <h5>✅ Positive Test Cases</h5>
+                                <p class="category-description">Test the happy path - verify that valid inputs produce expected results</p>
+                                <div class="test-options" id="positiveTests">
+                                    <!-- Test case options will be loaded here -->
+                                </div>
+                                <div class="custom-test-section">
+                                    <h6>✍️ Write Your Own Test Case:</h6>
+                                    <textarea 
+                                        class="custom-test-input" 
+                                        id="customPositive"
+                                        placeholder="Example: User login with valid email format (user@domain.com) and correct password should display welcome message and redirect to dashboard"
+                                        maxlength="200">
+                                    </textarea>
+                                    <button class="add-test-btn" onclick="addCustomTestCase('positive', 'customPositive')">
+                                        Add Test Case (+5-25 pts)
+                                    </button>
+                                    <div class="custom-tests-list" id="customPositiveList"></div>
+                                </div>
+                            </div>
+                            <div class="category-section">
+                                <h5>❌ Negative Test Cases</h5>
+                                <p class="category-description">Test error handling - what happens with invalid or unexpected inputs</p>
+                                <div class="test-options" id="negativeTests">
+                                    <!-- Test case options will be loaded here -->
+                                </div>
+                                <div class="custom-test-section">
+                                    <h6>✍️ Write Your Own Test Case:</h6>
+                                    <textarea 
+                                        class="custom-test-input" 
+                                        id="customNegative"
+                                        placeholder="Example: Login attempt with empty password field should display 'Password is required' error message and prevent login"
+                                        maxlength="200">
+                                    </textarea>
+                                    <button class="add-test-btn" onclick="addCustomTestCase('negative', 'customNegative')">
+                                        Add Test Case (+5-25 pts)
+                                    </button>
+                                    <div class="custom-tests-list" id="customNegativeList"></div>
+                                </div>
+                            </div>
+                            <div class="category-section">
+                                <h5>🎯 Boundary Test Cases</h5>
+                                <p class="category-description">Test edge cases and limits - values at the boundaries of acceptable ranges</p>
+                                <div class="test-options" id="boundaryTests">
+                                    <!-- Test case options will be loaded here -->
+                                </div>
+                                <div class="custom-test-section">
+                                    <h6>✍️ Write Your Own Test Case:</h6>
+                                    <textarea 
+                                        class="custom-test-input" 
+                                        id="customBoundary"
+                                        placeholder="Example: Username field with exactly 50 characters (maximum limit) should be accepted and saved successfully"
+                                        maxlength="200">
+                                    </textarea>
+                                    <button class="add-test-btn" onclick="addCustomTestCase('boundary', 'customBoundary')">
+                                        Add Test Case (+5-25 pts)
+                                    </button>
+                                    <div class="custom-tests-list" id="customBoundaryList"></div>
+                                </div>
+                            </div>
+                            <div class="category-section">
+                                <h5>🔒 Security Test Cases</h5>
+                                <p class="category-description">Test for vulnerabilities - think like an attacker trying to exploit the system</p>
+                                <div class="test-options" id="securityTests">
+                                    <!-- Test case options will be loaded here -->
+                                </div>
+                                <div class="custom-test-section">
+                                    <h6>✍️ Write Your Own Test Case:</h6>
+                                    <textarea 
+                                        class="custom-test-input" 
+                                        id="customSecurity"
+                                        placeholder="Example: Login attempt with SQL injection payload ('; DROP TABLE users; --) should be blocked and logged as security violation"
+                                        maxlength="200">
+                                    </textarea>
+                                    <button class="add-test-btn" onclick="addCustomTestCase('security', 'customSecurity')">
+                                        Add Test Case (+5-25 pts)
+                                    </button>
+                                    <div class="custom-tests-list" id="customSecurityList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Swipe Hint -->
+                    <div class="swipe-hint" id="swipeHint">
+                        <span>👆 Swipe or use navigation buttons to browse test categories</span>
+                    </div>
+                </div>
+
+                <div class="game-actions">
+                    <button class="action-btn hint-btn" onclick="getHint()">💡 Hint</button>
+                    <button class="action-btn submit-btn" onclick="submitTestCases()">✅ Submit Test Cases</button>
+                    <button class="action-btn leaderboard-btn" onclick="showGameLeaderboard()">🏆 Leaderboard</button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div class="game-area hidden" id="gameResults">
+                <div class="results-content">
+                    <h3 id="resultsTitle">Test Case Analysis</h3>
+                    <div class="results-summary" id="resultsSummary">
+                        <!-- Results will be displayed here -->
+                    </div>
+                    <div class="missed-cases" id="missedCases">
+                        <!-- Missed test cases will be shown here -->
+                    </div>
+                    <div class="results-actions">
+                        <button class="action-btn" onclick="nextFeature()">➡️ Next Feature</button>
+                        <button class="action-btn" onclick="restartGame()">🔄 Try Again</button>
+                        <button class="action-btn" onclick="backToSelection()">🏠 Main Menu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/leaderboard.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

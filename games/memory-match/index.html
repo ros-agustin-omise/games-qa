@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match - Game Hub</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/leaderboard.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-container">
+            <button class="back-button" onclick="goHome()">← Back to Games</button>
+            
+            <div class="game-header">
+                <h1>🧠 Memory Match</h1>
+                <div class="score-board">
+                    <div>Moves: <span id="moves">0</span></div>
+                    <div>Matches: <span id="matches">0</span></div>
+                    <div>Time: <span id="timer">00:00</span></div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="game-status">
+                    <h2 id="gameStatus">Click cards to find matching pairs!</h2>
+                </div>
+                
+                <div class="difficulty-selector" id="difficultySelector">
+                    <h3>Choose Difficulty:</h3>
+                    <button class="difficulty-btn" onclick="startGame(8)">Easy (4x2)</button>
+                    <button class="difficulty-btn" onclick="startGame(18)">Medium (6x3)</button>
+                    <button class="difficulty-btn" onclick="startGame(32)">Hard (8x4)</button>
+                </div>
+                
+                <div class="game-board" id="gameBoard">
+                    <!-- Cards will be generated here -->
+                </div>
+                
+                <div class="game-controls">
+                    <button class="game-button" onclick="showDifficultySelector()">New Game</button>
+                    <button class="game-button" onclick="resetGame()">Reset Current</button>
+                    <button class="leaderboard-button" onclick="showGameLeaderboard()">🏆 Leaderboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/leaderboard.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

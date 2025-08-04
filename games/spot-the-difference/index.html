@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot the Difference - Game Hub</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/leaderboard.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-container">
+            <button class="back-button" onclick="goHome()">← Back to Games</button>
+            
+            <div class="game-header">
+                <h1>🔍 Spot the Difference</h1>
+                <div class="score-board">
+                    <div>Level: <span id="currentLevel">1</span></div>
+                    <div>Found: <span id="differencesFound">0</span> / <span id="totalDifferences">5</span></div>
+                    <div>Time: <span id="timer">00:00</span></div>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="level-selector" id="levelSelector">
+                    <h3>Choose a Level:</h3>
+                    <div class="level-options">
+                        <button class="level-btn" onclick="startLevel(1)">
+                            Level 1<br><small>Easy - 5 differences</small>
+                        </button>
+                        <button class="level-btn" onclick="startLevel(2)">
+                            Level 2<br><small>Medium - 6 differences</small>
+                        </button>
+                        <button class="level-btn" onclick="startLevel(3)">
+                            Level 3<br><small>Hard - 7 differences</small>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="game-play hidden" id="gamePlay">
+                    <div class="game-status">
+                        <h2 id="gameStatus">Find all the differences by clicking on them!</h2>
+                        <div class="comparison-instruction">👀 Compare the images and click on differences in the RIGHT image (Image B)</div>
+                    </div>
+                    
+                    <div class="images-container">
+                        <div class="image-panel">
+                            <h3>Image A</h3>
+                            <div class="game-image" id="imageA">
+                                <!-- CSS-generated scene will be created here -->
+                            </div>
+                        </div>
+                        
+                        <div class="image-panel">
+                            <h3>Image B</h3>
+                            <div class="game-image" id="imageB">
+                                <!-- CSS-generated scene with differences will be created here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="differences-tracker" id="differencesTracker">
+                            <!-- Difference indicators will appear here -->
+                        </div>
+                    </div>
+                    
+                    <div class="game-controls">
+                        <button class="game-button" onclick="getHint()">💡 Hint</button>
+                        <button class="game-button" onclick="resetLevel()">🔄 Reset</button>
+                        <button class="game-button" onclick="showLevelSelector()">📋 Levels</button>
+                        <button class="leaderboard-button" onclick="showGameLeaderboard()">🏆 Leaderboard</button>
+                    </div>
+                </div>
+                
+                <div class="game-complete hidden" id="gameComplete">
+                    <div class="completion-message">
+                        <h2>🎉 Level Complete!</h2>
+                        <div class="completion-stats" id="completionStats"></div>
+                    </div>
+                    <div class="game-controls">
+                        <button class="game-button" onclick="nextLevel()">➡️ Next Level</button>
+                        <button class="game-button" onclick="showLevelSelector()">📋 All Levels</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/leaderboard.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

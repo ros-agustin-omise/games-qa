@@ -1,0 +1,31 @@
+{
+  "name": "game-hub",
+  "version": "1.0.0",
+  "description": "A web-based gaming platform featuring multiple interactive games",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "games",
+    "web",
+    "html5",
+    "javascript",
+    "spot-the-difference",
+    "memory-game",
+    "rock-paper-scissors",
+    "number-guessing",
+    "word-scramble"
+  ],
+  "author": "Game Hub Developer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/game-hub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/game-hub/issues"
+  },
+  "homepage": "https://github.com/username/game-hub#readme"
+}
