@@ -1,31 +1,39 @@
 {
-  "name": "game-hub",
+  "name": "playverse",
   "version": "1.0.0",
-  "description": "A web-based gaming platform featuring multiple interactive games",
+  "description": "A web-based gaming platform featuring multiple interactive games - Choose your adventure and dive in!",
   "main": "index.html",
   "scripts": {
     "start": "python -m http.server 8000",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python3 -m http.server 8000",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d .",
+    "build": "echo 'No build step required for static site'"
   },
   "keywords": [
     "games",
     "web",
     "html5",
     "javascript",
+    "playverse",
     "spot-the-difference",
     "memory-game",
     "rock-paper-scissors",
     "number-guessing",
-    "word-scramble"
+    "word-scramble",
+    "test-case-designer"
   ],
-  "author": "Game Hub Developer",
+  "author": "Rosanna A",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/game-hub.git"
+    "url": "https://github.com/ros-agustin-omise/games-qa.git"
   },
   "bugs": {
-    "url": "https://github.com/username/game-hub/issues"
+    "url": "https://github.com/ros-agustin-omise/games-qa/issues"
   },
-  "homepage": "https://github.com/username/game-hub#readme"
+  "homepage": "https://ros-agustin-omise.github.io/games-qa/",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  }
 }
