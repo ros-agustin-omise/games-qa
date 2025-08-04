@@ -8,7 +8,7 @@
     "serve": "python3 -m http.server 8000",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d .",
-    "build": "echo 'Static site ready for deployment'",
+    "build": "mkdir -p public && cp -r . public/ && rm -rf public/node_modules public/.git public/public",
     "dev": "python3 -m http.server 8000"
   },
   "keywords": [
