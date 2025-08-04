@@ -18,6 +18,7 @@ class RockPaperScissorsGame {
         this.roomCode = null;
         this.isHost = false;
         this.opponentConnected = false;
+        this.firebaseMultiplayer = null;
         
         // Game choices
         this.choices = {
@@ -33,6 +34,42 @@ class RockPaperScissorsGame {
         this.loadScores();
         this.setGameMode('single');
         this.updateUI();
+        this.initializeOnlineMultiplayer();
+    }
+    
+    initializeOnlineMultiplayer() {
+        // Initialize Firebase multiplayer system
+        if (typeof FirebaseMultiplayer !== 'undefined') {
+            this.firebaseMultiplayer = new FirebaseMultiplayer();
+            
+            // Set up callback to handle Firebase events
+            this.firebaseMultiplayer.gameCallback = (data) => {
+                this.handleFirebaseEvent(data);
+            };
+            
+            console.log('Online multiplayer system initialized');
+        } else {
+            console.log('Firebase multiplayer not available - online mode will use simulation');
+        }
+    }
+    
+    handleFirebaseEvent(data) {
+        console.log('Firebase event received:', data);
+        
+        switch (data.type) {
+            case 'opponent_joined':
+                this.opponentConnected = true;
+                document.getElementById('connectionStatus').textContent = data.message;
+                this.updateGameStatus('Opponent connected! Make your choice.');
+                break;
+                
+            case 'game_result':
+                this.handleOnlineGameResult(data);
+                break;
+                
+            default:
+                console.log('Unknown Firebase event type:', data.type);
+        }
     }
     
     // Game Mode Management
@@ -359,18 +396,27 @@ class RockPaperScissorsGame {
     
     // Online Multiplayer Functions
     createRoom() {
-        this.roomCode = this.generateRoomCode();
-        this.isHost = true;
+        if (!this.firebaseMultiplayer) {
+            this.fallbackCreateRoom();
+            return;
+        }
         
         document.getElementById('roomSection').style.display = 'none';
         document.getElementById('roomInfo').style.display = 'block';
-        document.getElementById('currentRoomCode').textContent = this.roomCode;
-        document.getElementById('connectionStatus').textContent = 'Waiting for opponent to join...';
+        document.getElementById('connectionStatus').textContent = 'Creating room...';
         
-        // Simulate room creation
-        setTimeout(() => {
-            this.simulateOpponentJoin();
-        }, 3000);
+        this.firebaseMultiplayer.createRoom((result) => {
+            if (result.success) {
+                this.roomCode = result.roomCode;
+                this.isHost = true;
+                document.getElementById('currentRoomCode').textContent = this.roomCode;
+                document.getElementById('connectionStatus').textContent = result.message;
+            } else {
+                document.getElementById('connectionStatus').textContent = result.message;
+                // Fallback to simulation after 2 seconds
+                setTimeout(() => this.fallbackCreateRoom(), 2000);
+            }
+        });
     }
     
     joinRoom() {
@@ -380,21 +426,36 @@ class RockPaperScissorsGame {
             return;
         }
         
-        this.roomCode = roomCode;
-        this.isHost = false;
+        if (!this.firebaseMultiplayer) {
+            this.fallbackJoinRoom(roomCode);
+            return;
+        }
         
         document.getElementById('roomSection').style.display = 'none';
         document.getElementById('roomInfo').style.display = 'block';
-        document.getElementById('currentRoomCode').textContent = this.roomCode;
-        document.getElementById('connectionStatus').textContent = 'Connecting to opponent...';
+        document.getElementById('currentRoomCode').textContent = roomCode;
+        document.getElementById('connectionStatus').textContent = 'Connecting to room...';
         
-        // Simulate joining room
-        setTimeout(() => {
-            this.simulateOpponentConnection();
-        }, 2000);
+        this.firebaseMultiplayer.joinRoom(roomCode, (result) => {
+            if (result.success) {
+                this.roomCode = result.roomCode;
+                this.isHost = false;
+                this.opponentConnected = true;
+                document.getElementById('connectionStatus').textContent = result.message;
+                this.updateGameStatus('Connected! Make your choice to play.');
+            } else {
+                document.getElementById('connectionStatus').textContent = result.message;
+                // Fallback to simulation after 2 seconds
+                setTimeout(() => this.fallbackJoinRoom(roomCode), 2000);
+            }
+        });
     }
     
     leaveRoom() {
+        if (this.firebaseMultiplayer) {
+            this.firebaseMultiplayer.leaveRoom();
+        }
+        
         this.roomCode = null;
         this.isHost = false;
         this.opponentConnected = false;
@@ -423,27 +484,75 @@ class RockPaperScissorsGame {
     }
     
     sendChoiceToOpponent(choice) {
-        // In a real implementation, this would send data to Firebase/backend
-        console.log(`Sending choice to opponent: ${choice}`);
+        if (!this.firebaseMultiplayer) {
+            return this.fallbackSendChoice(choice);
+        }
         
-        // Simulate opponent response
-        setTimeout(() => {
-            const opponentChoice = this.getComputerChoice();
-            this.receiveOpponentChoice(opponentChoice);
-        }, 1000 + Math.random() * 2000);
+        this.firebaseMultiplayer.sendChoice(choice, (result) => {
+            if (result.success) {
+                console.log('Choice sent successfully to opponent');
+            } else {
+                console.log('Failed to send choice, using fallback');
+                this.fallbackSendChoice(choice);
+            }
+        });
     }
     
-    receiveOpponentChoice(choice) {
-        this.player2Choice = choice;
-        this.showPlayerChoice(2, choice);
-        this.updatePlayerStatus(2, 'Choice received!');
+    handleOnlineGameResult(data) {
+        this.player1Choice = data.playerChoice;
+        this.player2Choice = data.opponentChoice;
         
+        this.showChoices();
         this.determineWinner();
         this.updateScores();
         this.addToHistory();
         this.saveScores();
         
         setTimeout(() => this.resetRound(), 3000);
+    }
+    
+    // Fallback methods for when Firebase isn't available
+    fallbackCreateRoom() {
+        this.roomCode = this.generateRoomCode();
+        this.isHost = true;
+        
+        document.getElementById('roomSection').style.display = 'none';
+        document.getElementById('roomInfo').style.display = 'block';
+        document.getElementById('currentRoomCode').textContent = this.roomCode;
+        document.getElementById('connectionStatus').textContent = 'Waiting for opponent... (Simulation mode)';
+        
+        // Simulate opponent joining
+        setTimeout(() => {
+            this.simulateOpponentJoin();
+        }, 3000);
+    }
+    
+    fallbackJoinRoom(roomCode) {
+        this.roomCode = roomCode;
+        this.isHost = false;
+        
+        document.getElementById('roomSection').style.display = 'none';
+        document.getElementById('roomInfo').style.display = 'block';
+        document.getElementById('currentRoomCode').textContent = this.roomCode;
+        document.getElementById('connectionStatus').textContent = 'Connecting... (Simulation mode)';
+        
+        // Simulate connection
+        setTimeout(() => {
+            this.simulateOpponentConnection();
+        }, 2000);
+    }
+    
+    fallbackSendChoice(choice) {
+        console.log(`Simulating choice send: ${choice}`);
+        
+        // Simulate opponent response
+        setTimeout(() => {
+            const opponentChoice = this.getComputerChoice();
+            this.handleOnlineGameResult({
+                playerChoice: choice,
+                opponentChoice: opponentChoice
+            });
+        }, 1000 + Math.random() * 2000);
     }
 }
 
