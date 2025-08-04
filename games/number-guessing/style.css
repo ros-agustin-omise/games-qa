@@ -304,3 +304,78 @@
         max-width: 100%;
     }
 }
+
+/* Responsive Design for Number Guessing */
+@media (max-width: 768px) {
+    .difficulty-selector {
+        margin: 20px 0;
+    }
+    
+    .difficulty-btn {
+        margin: 5px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .game-input {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        padding: 12px;
+    }
+    
+    .guess-btn {
+        width: 100%;
+        max-width: 150px;
+        margin: 10px auto;
+        padding: 12px;
+    }
+    
+    .score-board {
+        flex-direction: column;
+        gap: 15px;
+        font-size: 1rem;
+    }
+    
+    .game-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .game-actions button {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        padding: 12px;
+    }
+    
+    .feedback {
+        font-size: 1rem;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-input {
+        font-size: 1rem;
+        padding: 10px;
+    }
+    
+    .guess-btn {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    .score-board {
+        font-size: 0.9rem;
+        gap: 10px;
+    }
+    
+    .difficulty-btn {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+}
