@@ -410,11 +410,14 @@ function checkLeaderboardQualification() {
                 details: gameDetails
             })
                 .then(result => {
-                    if (result.submitted) {
+                    if (result && result.submitted) {
                         const feedback = document.getElementById('feedbackMessage');
                         feedback.textContent = `🏆 Achievement unlocked! Added to leaderboard as ${result.playerName}!`;
                         feedback.className = 'feedback-message correct';
                     }
+                })
+                .catch(error => {
+                    console.warn('Leaderboard submission error:', error);
                 });
         }
     }
