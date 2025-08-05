@@ -367,13 +367,27 @@ class FirebaseGlobalLeaderboard {
         return leaderboard;
     }
 
-    // Score comparison logic
+    // Score comparison logic with time tiebreaker
     compareScores(a, b, gameName) {
         const lowScoreGames = ['spot-the-difference'];
         
         if (lowScoreGames.includes(gameName)) {
+            // Lower is better (time-based games)
+            if (a.score === b.score) {
+                // For same scores, faster time wins (lower is better)
+                const aTime = (a.details && a.details.time_taken) || Infinity;
+                const bTime = (b.details && b.details.time_taken) || Infinity;
+                return aTime - bTime;
+            }
             return a.score - b.score; // Ascending (lower is better)
         } else {
+            // Higher is better (score-based games)
+            if (a.score === b.score) {
+                // For same scores, faster time wins (lower is better)
+                const aTime = (a.details && a.details.time_taken) || Infinity;
+                const bTime = (b.details && b.details.time_taken) || Infinity;
+                return aTime - bTime;
+            }
             return b.score - a.score; // Descending (higher is better)
         }
     }

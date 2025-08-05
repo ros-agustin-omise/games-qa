@@ -5,7 +5,10 @@ let currentGame = {
     secretNumber: 0,
     guessesLeft: 0,
     guessHistory: [],
-    gameActive: false
+    gameActive: false,
+    startTime: null,
+    timerInterval: null,
+    totalTime: 0
 };
 
 let gameStats = {
@@ -51,7 +54,10 @@ function startGame(min, max, maxGuesses) {
         secretNumber: Math.floor(Math.random() * (max - min + 1)) + min,
         guessesLeft: maxGuesses,
         guessHistory: [],
-        gameActive: true
+        gameActive: true,
+        startTime: Date.now(),
+        timerInterval: null,
+        totalTime: 0
     };
     
     // Update UI
@@ -65,6 +71,9 @@ function startGame(min, max, maxGuesses) {
     document.getElementById('guessInput').max = max;
     document.getElementById('guessInput').value = '';
     document.getElementById('feedbackMessage').textContent = 'Make your first guess!';
+    
+    // Start timer
+    startTimer();
     document.getElementById('hint').textContent = '';
     document.getElementById('hint').className = 'hint';
     document.getElementById('guessHistory').innerHTML = '';
@@ -171,6 +180,8 @@ function updateGuessHistory() {
 
 function endGame(won) {
     currentGame.gameActive = false;
+    stopTimer(); // Stop and record timer
+    
     gameStats.totalGames++;
     
     if (won) {
@@ -248,8 +259,34 @@ function giveUp() {
     }
 }
 
+function startTimer() {
+    document.getElementById('timer').textContent = '00:00';
+    currentGame.timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - currentGame.startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        document.getElementById('timer').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function stopTimer() {
+    if (currentGame.timerInterval) {
+        clearInterval(currentGame.timerInterval);
+        currentGame.timerInterval = null;
+        currentGame.totalTime = Math.floor((Date.now() - currentGame.startTime) / 1000);
+    }
+}
+
 function playAgain() {
+    stopTimer(); // Stop current timer
     startGame(currentGame.min, currentGame.max, currentGame.maxGuesses);
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
 // Show leaderboard for this game
@@ -275,7 +312,9 @@ function checkLeaderboardQualification(won) {
         max_guesses: currentGame.maxGuesses,
         efficiency: efficiency + '%',
         current_streak: gameStats.currentStreak,
-        win_rate: Math.round((gameStats.gamesWon / gameStats.totalGames) * 100) + '%'
+        win_rate: Math.round((gameStats.gamesWon / gameStats.totalGames) * 100) + '%',
+        time_taken: currentGame.totalTime,
+        time_display: formatTime(currentGame.totalTime)
     };
     
     // Track game completion
