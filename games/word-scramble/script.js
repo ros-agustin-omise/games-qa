@@ -244,6 +244,7 @@ function handleIncorrectAnswer() {
     setTimeout(() => {
         input.className = '';
         feedback.textContent = '';
+        feedback.className = 'feedback-message'; // Reset the class to remove red styling
     }, 2000);
 }
 
@@ -289,6 +290,7 @@ function scrambleAgain() {
     
     setTimeout(() => {
         feedback.textContent = '';
+        feedback.className = 'feedback-message'; // Reset the class to remove styling
     }, 1500);
 }
 
