@@ -91,12 +91,22 @@ class FirebaseGlobalLeaderboard {
 
     // Test Firebase connection
     async testConnection() {
-        const testRef = this.database.ref('connection-test');
-        await testRef.set({
-            timestamp: this.firebase.database.ServerValue.TIMESTAMP,
-            test: true
-        });
-        await testRef.remove();
+        try {
+            const testRef = this.database.ref('connection-test');
+            await testRef.set({
+                timestamp: this.firebase.database.ServerValue.TIMESTAMP,
+                test: true
+            });
+            await testRef.remove();
+            console.log('✅ Firebase connection test successful!');
+        } catch (error) {
+            console.warn('❌ Firebase connection test failed:', error.message);
+            if (error.code === 'PERMISSION_DENIED') {
+                console.warn('💡 Fix: Update Firebase database rules to allow read/write access');
+                console.warn('📖 See: https://console.firebase.google.com/project/games-qa-prod/database/rules');
+            }
+            throw error;
+        }
     }
 
     // Initialize with demo data for offline mode
@@ -380,8 +390,7 @@ class FirebaseGlobalLeaderboard {
                         <div class="privacy-note">🔥 Firebase real-time sync across all devices globally</div>
                     </div>
                     <div class="modal-buttons">
-                        <button class="modal-btn primary" id="submitScore">🔥 Submit to Firebase</button>
-                        <button class="modal-btn secondary" id="submitLocal">💾 Save Locally Only</button>
+                        <button class="modal-btn primary" id="submitScore">🔥 Submit to Global Leaderboard</button>
                         <button class="modal-btn tertiary" id="skipScore">Skip</button>
                     </div>
                 </div>
@@ -415,17 +424,7 @@ class FirebaseGlobalLeaderboard {
                 resolve({ submitted: true, firebase: true, leaderboard, playerName, entry });
             };
 
-            // Local submit handler
-            const submitLocalHandler = () => {
-                const nameInput = document.getElementById('playerName');
-                const playerName = nameInput.value.trim() || 'Anonymous';
-                const entry = createEntry(playerName);
-                
-                const leaderboard = this.addScoreLocal(gameName, entry);
-                document.body.removeChild(modal);
-                
-                resolve({ submitted: true, firebase: false, leaderboard, playerName, entry });
-            };
+
 
             // Skip handler
             const skipHandler = () => {
@@ -435,7 +434,6 @@ class FirebaseGlobalLeaderboard {
 
             // Event listeners
             document.getElementById('submitScore').addEventListener('click', submitFirebaseHandler);
-            document.getElementById('submitLocal').addEventListener('click', submitLocalHandler);
             document.getElementById('skipScore').addEventListener('click', skipHandler);
             
             document.getElementById('playerName').addEventListener('keypress', (e) => {
@@ -488,15 +486,10 @@ class FirebaseGlobalLeaderboard {
                     ${this.renderLeaderboardList(leaderboard, currentPlayerName)}
                 </div>
                 <div class="leaderboard-actions">
-                    <button class="action-btn" id="refreshLeaderboard">🔄 Refresh</button>
-                    <button class="action-btn" id="toggleRealtime" data-active="${!this.offlineMode}">
-                        ${this.offlineMode ? '📶 Enable Real-time' : '⚡ Real-time ON'}
-                    </button>
-                    <button class="action-btn" id="firebaseStatus">🔥 Firebase Status</button>
+                    <button class="action-btn" id="refreshLeaderboard">🔄 Refresh Global Leaderboard</button>
                 </div>
                 <div class="modal-buttons">
                     <button class="modal-btn primary" id="closeLeaderboard">Close</button>
-                    <button class="modal-btn secondary" id="clearLocal">Clear Local</button>
                 </div>
             </div>
         `;
@@ -536,9 +529,7 @@ class FirebaseGlobalLeaderboard {
             refreshBtn.disabled = false;
         });
 
-        document.getElementById('firebaseStatus').addEventListener('click', () => {
-            this.showFirebaseStatus();
-        });
+
 
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
@@ -548,59 +539,7 @@ class FirebaseGlobalLeaderboard {
         });
     }
 
-    // Show Firebase connection status
-    showFirebaseStatus() {
-        const statusModal = document.createElement('div');
-        statusModal.className = 'leaderboard-modal';
-        statusModal.innerHTML = `
-            <div class="leaderboard-modal-content">
-                <div class="leaderboard-header">
-                    <h2>🔥 Firebase Status</h2>
-                </div>
-                <div class="firebase-status-info">
-                    <div class="status-item">
-                        <strong>Connection:</strong> 
-                        <span class="${this.offlineMode ? 'status-offline' : 'status-online'}">
-                            ${this.offlineMode ? '❌ Offline' : '✅ Connected'}
-                        </span>
-                    </div>
-                    <div class="status-item">
-                        <strong>Database:</strong> 
-                        <span class="${this.database ? 'status-online' : 'status-offline'}">
-                            ${this.database ? '🔥 Firebase Realtime Database' : '❌ Not connected'}
-                        </span>
-                    </div>
-                    <div class="status-item">
-                        <strong>Real-time Listeners:</strong> 
-                        <span class="status-info">${this.realtimeListeners.size} active</span>
-                    </div>
-                    <div class="status-item">
-                        <strong>Project ID:</strong> 
-                        <span class="status-info">${this.firebaseConfig.projectId}</span>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-btn primary" id="closeStatus">Close</button>
-                    <button class="modal-btn secondary" id="retryConnection">🔄 Retry Connection</button>
-                </div>
-            </div>
-        `;
 
-        document.body.appendChild(statusModal);
-
-        document.getElementById('closeStatus').addEventListener('click', () => {
-            document.body.removeChild(statusModal);
-        });
-
-        document.getElementById('retryConnection').addEventListener('click', async () => {
-            const retryBtn = document.getElementById('retryConnection');
-            retryBtn.textContent = '🔄 Connecting...';
-            retryBtn.disabled = true;
-            
-            await this.initializeFirebase();
-            document.body.removeChild(statusModal);
-        });
-    }
 
     // Generate device ID
     getDeviceId() {
