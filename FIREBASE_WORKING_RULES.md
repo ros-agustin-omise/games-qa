@@ -23,6 +23,14 @@ Copy and paste these rules in your Firebase Console to fix permissions AND impro
         }
       }
     },
+    "issues": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["timestamp", "status"],
+      "$issue": {
+        ".validate": "newData.hasChildren(['title', 'description', 'status']) && newData.child('title').isString() && newData.child('description').isString() && newData.child('status').isString() && (newData.child('status').val() == 'open' || newData.child('status').val() == 'fixed' || newData.child('status').val() == 'rejected')"
+      }
+    },
     "connection-test": {
       ".read": true,
       ".write": true

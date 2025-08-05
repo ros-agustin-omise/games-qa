@@ -3,6 +3,180 @@ function openGame(gameName) {
     window.location.href = `games/${gameName}/index.html`;
 }
 
+// Issue reporting functionality
+function showReportIssue() {
+    const modal = document.createElement('div');
+    modal.className = 'leaderboard-modal';
+    modal.innerHTML = `
+        <div class="leaderboard-modal-content" style="max-width: 600px;">
+            <div class="leaderboard-header">
+                <h2>🐛 Report an Issue</h2>
+                <p>Help us improve Playverse by reporting bugs or suggesting features</p>
+            </div>
+            
+            <form id="issueForm">
+                <div style="margin-bottom: 20px;">
+                    <label for="issueTitle" style="display: block; margin-bottom: 5px; font-weight: bold;">Issue Title *</label>
+                    <input type="text" id="issueTitle" required maxlength="100" 
+                           placeholder="Brief description of the issue"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="issueGame" style="display: block; margin-bottom: 5px; font-weight: bold;">Related Game</label>
+                    <select id="issueGame" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em;">
+                        <option value="general">🎮 General / Website</option>
+                        <option value="memory-match">🧠 Memory Match</option>
+                        <option value="number-guessing">🎯 Number Guessing</option>
+                        <option value="word-scramble">📝 Word Scramble</option>
+                        <option value="rock-paper-scissors">✂️ Rock Paper Scissors</option>
+                        <option value="spot-the-difference">🔍 Spot the Difference</option>
+                        <option value="test-case-designer">🧪 Test Case Designer</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="issueType" style="display: block; margin-bottom: 5px; font-weight: bold;">Issue Type</label>
+                    <select id="issueType" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em;">
+                        <option value="bug">🐛 Bug Report</option>
+                        <option value="feature">✨ Feature Request</option>
+                        <option value="improvement">🔧 Improvement</option>
+                        <option value="other">❓ Other</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="issueDescription" style="display: block; margin-bottom: 5px; font-weight: bold;">Description *</label>
+                    <textarea id="issueDescription" required rows="5" maxlength="1000"
+                              placeholder="Please describe the issue in detail. Include steps to reproduce if it's a bug."
+                              style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em; resize: vertical;"></textarea>
+                    <div style="text-align: right; font-size: 0.8em; color: #666; margin-top: 5px;">
+                        <span id="charCount">0</span>/1000 characters
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label for="reporterName" style="display: block; margin-bottom: 5px; font-weight: bold;">Your Name (Optional)</label>
+                    <input type="text" id="reporterName" maxlength="50" 
+                           placeholder="Your name (optional)"
+                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em;">
+                </div>
+            </form>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="submitIssue">🚀 Submit Issue</button>
+                <button class="modal-btn secondary" id="cancelIssue">Cancel</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    
+    // Character counter
+    const descriptionField = document.getElementById('issueDescription');
+    const charCount = document.getElementById('charCount');
+    
+    descriptionField.addEventListener('input', () => {
+        charCount.textContent = descriptionField.value.length;
+    });
+    
+    // Focus on title field
+    setTimeout(() => document.getElementById('issueTitle').focus(), 100);
+
+    // Submit handler
+    document.getElementById('submitIssue').addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('issueTitle').value.trim();
+        const description = document.getElementById('issueDescription').value.trim();
+        const game = document.getElementById('issueGame').value;
+        const type = document.getElementById('issueType').value;
+        const reporterName = document.getElementById('reporterName').value.trim() || 'Anonymous';
+        
+        if (!title || !description) {
+            alert('Please fill in all required fields (Title and Description).');
+            return;
+        }
+        
+        // Disable button and show loading
+        const submitBtn = document.getElementById('submitIssue');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '🔄 Submitting...';
+        
+        try {
+            // Submit to Firebase using existing Firebase connection
+            if (window.firebaseGlobalLeaderboard && window.firebaseGlobalLeaderboard.database) {
+                const issueRef = window.firebaseGlobalLeaderboard.database.ref('issues').push();
+                const issue = {
+                    title,
+                    description,
+                    game,
+                    type,
+                    status: 'open',
+                    reportedBy: reporterName,
+                    timestamp: Date.now(),
+                    createdAt: new Date().toISOString(),
+                    deviceInfo: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        language: navigator.language
+                    }
+                };
+                
+                await issueRef.set(issue);
+                
+                // Track analytics
+                if (window.analytics) {
+                    window.analytics.trackEvent('issue_reported', {
+                        game: game,
+                        type: type
+                    });
+                }
+                
+                // Show success message
+                modal.innerHTML = `
+                    <div class="leaderboard-modal-content" style="max-width: 500px; text-align: center;">
+                        <div class="leaderboard-header">
+                            <h2 style="color: #27ae60;">✅ Issue Submitted!</h2>
+                            <p>Thank you for helping us improve Playverse!</p>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p>Your issue has been successfully submitted and will be reviewed by our team.</p>
+                            <p style="color: #666; font-size: 0.9em;">Issue ID: ${issueRef.key}</p>
+                        </div>
+                        <div class="modal-buttons">
+                            <button class="modal-btn primary" onclick="window.location.href='issues.html'">📋 View All Issues</button>
+                            <button class="modal-btn secondary" onclick="document.body.removeChild(this.closest('.leaderboard-modal'))">Close</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                throw new Error('Firebase not initialized');
+            }
+            
+        } catch (error) {
+            console.error('Error submitting issue:', error);
+            alert('Failed to submit issue: ' + error.message);
+            
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🚀 Submit Issue';
+        }
+    });
+
+    // Cancel handler
+    document.getElementById('cancelIssue').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+
+    // Close on backdrop click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+}
+
 // Initialize Firebase Global Leaderboard
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Firebase Global Leaderboard
