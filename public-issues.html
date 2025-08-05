@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Issues - Playverse</title>
+    <title>Public Issues - Playverse</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/leaderboard.css">
     <style>
@@ -77,6 +77,22 @@
 
         .filter-btn:hover {
             transform: translateY(-2px);
+        }
+
+        .admin-link {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .admin-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
         }
 
         .issues-list {
@@ -166,42 +182,6 @@
             margin-bottom: 15px;
         }
 
-        .issue-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .action-btn.fix {
-            background: #27ae60;
-            color: white;
-        }
-
-        .action-btn.reject {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .action-btn.reopen {
-            background: #3498db;
-            color: white;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-1px);
-            opacity: 0.9;
-        }
-
         .no-issues {
             text-align: center;
             padding: 60px 20px;
@@ -236,6 +216,25 @@
 
         .home-btn:hover {
             transform: translateY(-2px);
+        }
+
+        .public-notice {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .public-notice h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .public-notice p {
+            margin: 0;
+            opacity: 0.9;
         }
 
         @media (max-width: 768px) {
@@ -281,38 +280,15 @@
 <body>
     <a href="index.html" class="home-btn">🏠 Home</a>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="leaderboard-modal" style="display: block;">
-        <div class="leaderboard-modal-content" style="max-width: 400px;">
-            <div class="leaderboard-header">
-                <h2>🔐 Admin Login</h2>
-                <p>Enter admin credentials to manage issues</p>
-            </div>
-            
-            <form id="loginForm">
-                <div style="margin-bottom: 20px;">
-                    <label for="adminPassword" style="display: block; margin-bottom: 5px; font-weight: bold;">Admin Password</label>
-                    <input type="password" id="adminPassword" required 
-                           placeholder="Enter admin password"
-                           style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 1em;">
-                </div>
-            </form>
-            
-            <div class="modal-buttons">
-                <button class="modal-btn primary" id="loginBtn">🔓 Login</button>
-                <a href="public-issues.html" class="modal-btn secondary">👀 View Public Issues</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="issues-container" id="adminPanel" style="display: none;">
+    <div class="issues-container">
         <div class="issues-header">
-            <h1>🔐 Admin Issue Tracker</h1>
-            <p>Manage and resolve reported issues for Playverse games</p>
-            <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-                <a href="public-issues.html" class="filter-btn">👀 Public View</a>
-                <button class="filter-btn" onclick="logout()" style="background: #e74c3c; color: white;">🚪 Logout</button>
-            </div>
+            <h1>🐛 Public Issue Tracker</h1>
+            <p>View reported issues and track their status</p>
+        </div>
+
+        <div class="public-notice">
+            <h3>👀 Public View</h3>
+            <p>This is a read-only view for the community. To manage issues, <a href="issues.html" class="admin-link">🔐 Admin Login</a></p>
         </div>
 
         <div class="issues-stats" id="issuesStats">
@@ -360,95 +336,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
-    <!-- Issues JavaScript -->
-    <script src="js/issues.js"></script>
-    
-    <!-- Admin Authentication -->
-    <script>
-        // Simple admin authentication
-        const ADMIN_PASSWORD = 'playverse2025'; // Change this to your secure password
-        
-        function checkAuthentication() {
-            const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
-            if (isAuthenticated) {
-                showAdminPanel();
-            } else {
-                showLoginModal();
-            }
-        }
-        
-        function showLoginModal() {
-            document.getElementById('loginModal').style.display = 'block';
-            document.getElementById('adminPanel').style.display = 'none';
-            setTimeout(() => document.getElementById('adminPassword').focus(), 100);
-        }
-        
-        function showAdminPanel() {
-            document.getElementById('loginModal').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-        }
-        
-        function login() {
-            const password = document.getElementById('adminPassword').value;
-            const loginBtn = document.getElementById('loginBtn');
-            
-            if (!password) {
-                alert('Please enter a password');
-                return;
-            }
-            
-            loginBtn.disabled = true;
-            loginBtn.textContent = '🔄 Checking...';
-            
-            // Simulate a brief delay for authentication
-            setTimeout(() => {
-                if (password === ADMIN_PASSWORD) {
-                    sessionStorage.setItem('admin_authenticated', 'true');
-                    showAdminPanel();
-                    
-                    // Track successful login
-                    if (window.analytics) {
-                        window.analytics.trackEvent('admin_login_success');
-                    }
-                } else {
-                    alert('❌ Invalid password. Please try again.');
-                    document.getElementById('adminPassword').value = '';
-                    document.getElementById('adminPassword').focus();
-                    
-                    // Track failed login attempt
-                    if (window.analytics) {
-                        window.analytics.trackEvent('admin_login_failed');
-                    }
-                }
-                
-                loginBtn.disabled = false;
-                loginBtn.textContent = '🔓 Login';
-            }, 500);
-        }
-        
-        function logout() {
-            sessionStorage.removeItem('admin_authenticated');
-            showLoginModal();
-            
-            // Track logout
-            if (window.analytics) {
-                window.analytics.trackEvent('admin_logout');
-            }
-        }
-        
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthentication();
-            
-            document.getElementById('loginBtn').addEventListener('click', login);
-            
-            document.getElementById('adminPassword').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    login();
-                }
-            });
-        });
-    </script>
+    <!-- Public Issues JavaScript -->
+    <script src="js/public-issues.js"></script>
     
     <!-- Analytics -->
     <script src="js/analytics.js"></script>
@@ -457,7 +346,7 @@
     <script>
         // Track page view
         if (window.analytics) {
-            window.analytics.trackPageView('issues');
+            window.analytics.trackPageView('public-issues');
         }
     </script>
 </body>
