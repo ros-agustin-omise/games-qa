@@ -363,8 +363,10 @@ function skipWord() {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.showLeaderboard('word-scramble');
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.showLeaderboard('word-scramble');
+    } else if (window.gameLeaderboard) {
+        window.gameLeaderboard.showLeaderboard('word-scramble');
     }
 }
 
@@ -402,8 +404,8 @@ function checkLeaderboardQualification() {
             window.analytics.trackInteraction('achievement', 'word-scramble', { achievement: achievementText });
         }
         
-        if (window.globalLeaderboard) {
-            window.globalLeaderboard.submitScore('word-scramble', {
+            if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.submitScore('word-scramble', {
                 score: currentGame.score,
                 details: gameDetails
             })

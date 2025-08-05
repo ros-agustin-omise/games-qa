@@ -254,8 +254,10 @@ function playAgain() {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.showLeaderboard('number-guessing');
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.showLeaderboard('number-guessing');
+    } else if (window.gameLeaderboard) {
+        window.gameLeaderboard.showLeaderboard('number-guessing');
     }
 }
 
@@ -281,8 +283,8 @@ function checkLeaderboardQualification(won) {
         window.analytics.trackGameComplete('number-guessing', finalScore, won ? 'won' : 'lost');
     }
     
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.submitScore('number-guessing', {
+            if (window.firebaseGlobalLeaderboard) {
+            window.firebaseGlobalLeaderboard.submitScore('number-guessing', {
             score: finalScore,
             details: gameDetails
         })

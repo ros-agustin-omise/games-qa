@@ -286,8 +286,8 @@ function completeLevel() {
         difficulty: levelConfigs[currentGame.level].name
     };
     
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.submitScore('spot-the-difference', {
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.submitScore('spot-the-difference', {
             score: finalScore,
             details: gameDetails,
             scoreType: 'low'
@@ -381,8 +381,10 @@ function handleWrongClick(e) {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.showLeaderboard('spot-the-difference');
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.showLeaderboard('spot-the-difference');
+    } else if (window.gameLeaderboard) {
+        window.gameLeaderboard.showLeaderboard('spot-the-difference');
     }
 }
 
