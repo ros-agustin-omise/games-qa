@@ -8,8 +8,9 @@
     "serve": "python3 -m http.server 8000",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d .",
-    "build": "mkdir -p public && cp -r . public/ && rm -rf public/node_modules public/.git public/public",
-    "dev": "python3 -m http.server 8000"
+    "build": "node build-analytics.js && mkdir -p public && cp -r . public/ && rm -rf public/node_modules public/.git public/public public/build-analytics.js",
+    "dev": "python3 -m http.server 8000",
+    "build-analytics": "node build-analytics.js"
   },
   "keywords": [
     "games",
@@ -36,5 +37,8 @@
   "homepage": "https://ros-agustin-omise.github.io/games-qa/",
   "devDependencies": {
     "gh-pages": "^6.3.0"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^1.5.0"
   }
 }

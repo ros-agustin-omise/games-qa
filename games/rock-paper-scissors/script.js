@@ -56,6 +56,14 @@ function getComputerChoice() {
 function playGame(playerChoice) {
     const computerChoice = getComputerChoice();
     
+    // Track game interaction
+    if (window.analytics) {
+        window.analytics.trackInteraction('choice_made', 'rock-paper-scissors', {
+            playerChoice: playerChoice,
+            computerChoice: computerChoice
+        });
+    }
+    
     // Show choices with animation
     showChoice('playerChoice', playerChoice);
     showChoice('computerChoice', computerChoice);
@@ -74,6 +82,11 @@ function playGame(playerChoice) {
         result = 'computer';
         computerScore++;
         updateGameStatus("Computer wins!");
+    }
+    
+    // Track game completion
+    if (window.analytics) {
+        window.analytics.trackGameComplete('rock-paper-scissors', playerScore, result);
     }
     
     // Update display
@@ -223,6 +236,11 @@ function showGameLeaderboard() {
 document.addEventListener('DOMContentLoaded', () => {
     loadScores();
     updateGameStatus('Choose your move!');
+    
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('rock-paper-scissors');
+    }
     
     // Override the original playGame calls if they were bound elsewhere
     window.playGame = playGame;
