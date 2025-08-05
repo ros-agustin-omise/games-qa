@@ -7,15 +7,16 @@ class FirebaseGlobalLeaderboard {
         this.localMaxEntries = 10;
         this.syncEnabled = true;
         
-        // Firebase configuration - replace with your project details
+        // Firebase configuration - YOUR ACTUAL PROJECT
         this.firebaseConfig = {
-            apiKey: "your-api-key-here",
-            authDomain: "your-project-id.firebaseapp.com",
-            databaseURL: "https://your-project-id-default-rtdb.firebaseio.com/",
-            projectId: "your-project-id",
-            storageBucket: "your-project-id.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef123456789012345678"
+            apiKey: "AIzaSyAF_BGwl2SSPbnsyVGB9T2cHl3rR0KiyQs",
+            authDomain: "games-qa-prod.firebaseapp.com",
+            databaseURL: "https://games-qa-prod-default-rtdb.firebaseio.com/",
+            projectId: "games-qa-prod",
+            storageBucket: "games-qa-prod.firebasestorage.app",
+            messagingSenderId: "871171350020",
+            appId: "1:871171350020:web:93581c31a80657b3985f51",
+            measurementId: "G-K549VCVLMJ"
         };
         
         this.firebase = null;
