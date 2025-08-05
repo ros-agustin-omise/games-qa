@@ -310,22 +310,13 @@ class FirebaseGlobalLeaderboard {
         
         // If we have cached Firebase data, prioritize it
         if (cachedFirebase && cachedFirebase.length > 0) {
-            console.log(`Using cached Firebase data for ${gameName}:`, cachedFirebase.length, 'entries');
+            console.log(`Using cached Firebase data for ${gameName}:`, cachedFirebase.length, 'entries (offline mode)');
             
-            // Only add unsynced local scores to cached Firebase data
-            const localScores = this.getLocalLeaderboard(gameName);
-            const unsyncedLocalScores = localScores.filter(score => !score.synced);
-            
-            if (unsyncedLocalScores.length > 0) {
-                const merged = this.mergeScores(cachedFirebase, unsyncedLocalScores);
-                merged.sort((a, b) => this.compareScores(a, b, gameName));
-                return merged.slice(0, this.maxEntries);
-            }
-            
+            // Use cached Firebase data exclusively for consistency
             return cachedFirebase.slice(0, this.maxEntries);
         }
         
-        // Fallback: use local scores only (no demo data to avoid confusion)
+        // Fallback: use local scores only when no Firebase cache is available
         const localScores = this.getLocalLeaderboard(gameName);
         console.log(`No cached Firebase data, using local scores only for ${gameName}:`, localScores.length, 'entries');
         
