@@ -119,22 +119,35 @@ class PublicIssueTracker {
         };
 
         return `
-            <div class="issue-card ${issue.status}">
-                <div class="issue-header">
-                    <h3 class="issue-title">
-                        ${typeEmojis[issue.type] || '❓'} ${this.escapeHtml(issue.title)}
-                    </h3>
-                    <span class="issue-status status-${issue.status}">${issue.status}</span>
+            <div class="issue-card ${issue.status}" onclick="toggleIssue('${issue.id}')" id="issue-${issue.id}">
+                <div class="issue-summary">
+                    <div class="issue-main-info">
+                        <h3 class="issue-title">
+                            ${typeEmojis[issue.type] || '❓'} ${this.escapeHtml(issue.title)}
+                        </h3>
+                        <div class="issue-quick-meta">
+                            <span>🎮 ${gameEmojis[issue.game] || '🎮'} ${this.getGameTitle(issue.game)}</span>
+                            <span>👤 ${this.escapeHtml(issue.reportedBy)}</span>
+                            <span>📅 ${createdDate}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="issue-status-badge status-${issue.status}">${issue.status}</span>
+                        <span class="expand-indicator">▼</span>
+                    </div>
                 </div>
                 
-                <div class="issue-meta">
-                    <span>🎮 <strong>${gameEmojis[issue.game] || '🎮'} ${this.getGameTitle(issue.game)}</strong></span>
-                    <span>👤 ${this.escapeHtml(issue.reportedBy)}</span>
-                    <span>📅 ${createdDate} ${createdTime}</span>
-                </div>
-                
-                <div class="issue-description">
-                    ${this.escapeHtml(issue.description).replace(/\n/g, '<br>')}
+                <div class="issue-details">
+                    <div class="issue-meta">
+                        <span>🎮 <strong>${gameEmojis[issue.game] || '🎮'} ${this.getGameTitle(issue.game)}</strong></span>
+                        <span>👤 ${this.escapeHtml(issue.reportedBy)}</span>
+                        <span>📅 ${createdDate} ${createdTime}</span>
+                        <span>🔖 ${typeEmojis[issue.type]} ${issue.type.charAt(0).toUpperCase() + issue.type.slice(1)}</span>
+                    </div>
+                    
+                    <div class="issue-description">
+                        ${this.escapeHtml(issue.description).replace(/\n/g, '<br>')}
+                    </div>
                 </div>
             </div>
         `;
@@ -190,6 +203,35 @@ class PublicIssueTracker {
             <button onclick="window.location.reload()" class="filter-btn">🔄 Retry</button>
         `;
         noIssues.style.display = 'block';
+    }
+}
+
+// Toggle issue details
+function toggleIssue(issueId) {
+    const issueCard = document.getElementById(`issue-${issueId}`);
+    if (issueCard) {
+        const isExpanded = issueCard.classList.contains('expanded');
+        
+        // Close all other expanded issues
+        document.querySelectorAll('.issue-card.expanded').forEach(card => {
+            if (card.id !== `issue-${issueId}`) {
+                card.classList.remove('expanded');
+            }
+        });
+        
+        // Toggle current issue
+        if (isExpanded) {
+            issueCard.classList.remove('expanded');
+        } else {
+            issueCard.classList.add('expanded');
+            
+            // Track analytics
+            if (window.analytics) {
+                window.analytics.trackEvent('issue_details_expanded', { 
+                    issue_id: issueId 
+                });
+            }
+        }
     }
 }
 

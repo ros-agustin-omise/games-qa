@@ -96,22 +96,27 @@
         }
 
         .issues-list {
-            display: grid;
-            gap: 20px;
+            display: block;
         }
 
         .issue-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 5px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #ddd;
             transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
         }
 
         .issue-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .issue-card.expanded {
+            cursor: default;
+            margin-bottom: 15px;
         }
 
         .issue-card.open {
@@ -126,30 +131,60 @@
             border-left-color: #95a5a6;
         }
 
-        .issue-header {
+        .issue-summary {
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
+            align-items: center;
+            gap: 15px;
+            min-height: 60px;
+        }
+
+        .issue-summary:hover {
+            background: #f8f9fa;
+        }
+
+        .issue-card.expanded .issue-summary {
+            border-bottom: 1px solid #eee;
+            background: white;
+        }
+
+        .issue-main-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .issue-title {
-            font-size: 1.2em;
-            font-weight: bold;
+            font-size: 1.1em;
+            font-weight: 600;
             color: #333;
-            margin: 0;
-            flex: 1;
-            min-width: 200px;
+            margin: 0 0 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .issue-status {
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
+        .issue-card.expanded .issue-title {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: initial;
+        }
+
+        .issue-quick-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #666;
+            flex-wrap: wrap;
+        }
+
+        .issue-status-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
             font-weight: bold;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .status-open {
@@ -167,19 +202,44 @@
             color: white;
         }
 
+        .expand-indicator {
+            color: #666;
+            font-size: 1.2em;
+            transition: transform 0.3s ease;
+            user-select: none;
+        }
+
+        .issue-card.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        .issue-details {
+            display: none;
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid #eee;
+            background: #fafbfc;
+        }
+
+        .issue-card.expanded .issue-details {
+            display: block;
+        }
+
         .issue-meta {
             display: flex;
             gap: 20px;
             font-size: 0.9em;
             color: #666;
-            margin-bottom: 15px;
+            margin: 15px 0;
             flex-wrap: wrap;
         }
 
         .issue-description {
             color: #555;
             line-height: 1.6;
-            margin-bottom: 15px;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
         }
 
         .no-issues {
