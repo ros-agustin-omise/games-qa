@@ -56,8 +56,7 @@ class FirebaseGlobalLeaderboard {
             console.log('✅ Firebase connected successfully!');
             this.offlineMode = false;
             
-            // Enable offline persistence
-            this.database.goOffline();
+            // Keep Firebase online for real-time data sync
             this.database.goOnline();
             
         } catch (error) {
