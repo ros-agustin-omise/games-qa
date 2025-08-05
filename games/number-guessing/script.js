@@ -181,7 +181,7 @@ function endGame(won) {
         }
         
         // Check for leaderboard qualification
-        checkLeaderboardQualification();
+        checkLeaderboardQualification(won);
     } else {
         gameStats.currentStreak = 0;
     }
@@ -260,7 +260,7 @@ function showGameLeaderboard() {
 }
 
 // Check if player qualifies for leaderboard
-function checkLeaderboardQualification() {
+function checkLeaderboardQualification(won) {
     // Calculate score based on difficulty, efficiency, and streak
     const difficultyMultiplier = getDifficultyMultiplier();
     const efficiency = Math.round(100 - ((currentGame.guessHistory.length / currentGame.maxGuesses) * 100));
