@@ -3,7 +3,7 @@
 
 class FirebaseGlobalLeaderboard {
     constructor() {
-        this.maxEntries = 50;
+        this.maxEntries = 10;
         this.localMaxEntries = 10;
         this.syncEnabled = true;
         
@@ -162,6 +162,8 @@ class FirebaseGlobalLeaderboard {
                         ...childSnapshot.val()
                     });
                 });
+                // Firebase limitToLast returns in ascending order, so reverse for highest-first
+                firebaseScores.reverse();
             }
 
             // Merge with local scores
@@ -203,6 +205,8 @@ class FirebaseGlobalLeaderboard {
                             ...childSnapshot.val()
                         });
                     });
+                    // Firebase limitToLast returns in ascending order, so reverse for highest-first
+                    realtimeScores.reverse();
                 }
                 
                 // Sort and callback
@@ -305,8 +309,8 @@ class FirebaseGlobalLeaderboard {
         
         leaderboard.sort((a, b) => this.compareScores(a, b, gameName));
         
-        if (leaderboard.length > this.localMaxEntries) {
-            leaderboard.length = this.localMaxEntries;
+        if (leaderboard.length > this.maxEntries) {
+            leaderboard.length = this.maxEntries;
         }
 
         this.saveLocalLeaderboard(gameName, leaderboard);
@@ -362,7 +366,7 @@ class FirebaseGlobalLeaderboard {
         // Check if qualifies
         const qualifies = await this.qualifiesForLeaderboard(gameName, score, scoreType);
         
-        if (!qualifies && (await this.getGlobalLeaderboard(gameName)).length >= this.localMaxEntries) {
+        if (!qualifies && (await this.getGlobalLeaderboard(gameName)).length >= this.maxEntries) {
             this.showScoreTooLow(score, this.getScoreLabel(gameName, scoreType));
             return null;
         }
