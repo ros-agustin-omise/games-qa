@@ -328,10 +328,13 @@ function checkLeaderboardQualification(won) {
             details: gameDetails
         })
             .then(result => {
-                if (result.submitted) {
+                if (result && result.submitted) {
                     const resultDiv = document.getElementById('resultMessage');
                     resultDiv.innerHTML += `<br>🏆 Added to leaderboard as ${result.playerName}!`;
                 }
+            })
+            .catch(error => {
+                console.warn('Leaderboard submission error:', error);
             });
     }
 }
