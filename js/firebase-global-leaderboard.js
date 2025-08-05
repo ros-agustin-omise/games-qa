@@ -692,12 +692,26 @@ class FirebaseGlobalLeaderboard {
     }
 
     formatScoreDetails(entry) {
-        let details = `${entry.date}`;
-        if (entry.level) details += ` • Level ${entry.level}`;
-        if (entry.moves) details += ` • ${entry.moves} moves`;
-        if (entry.time_taken) details += ` • ${entry.time_taken}`;
-        if (entry.difficulty) details += ` • ${entry.difficulty}`;
-        return details;
+        if (!entry.details) {
+            let details = `${entry.date}`;
+            if (entry.level) details += ` • Level ${entry.level}`;
+            if (entry.moves) details += ` • ${entry.moves} moves`;
+            if (entry.time_taken) details += ` • ${entry.time_taken}`;
+            if (entry.difficulty) details += ` • ${entry.difficulty}`;
+            return details;
+        }
+        
+        let details = [];
+        if (entry.details.difficulty) details.push(`${entry.details.difficulty}`);
+        if (entry.details.moves) details.push(`${entry.details.moves} moves`);
+        if (entry.details.time_display) details.push(`⏱️ ${entry.details.time_display}`);
+        else if (entry.details.time_taken) details.push(`⏱️ ${entry.details.time_taken}s`);
+        if (entry.details.hints_used) details.push(`${entry.details.hints_used} hints`);
+        if (entry.details.efficiency) details.push(`${entry.details.efficiency} efficient`);
+        if (entry.details.guesses_used) details.push(`${entry.details.guesses_used}/${entry.details.max_guesses} guesses`);
+        if (entry.details.current_streak) details.push(`${entry.details.current_streak} streak`);
+        
+        return details.join(' • ');
     }
 
     showScoreTooLow(score, label) {
