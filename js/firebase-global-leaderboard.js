@@ -167,11 +167,12 @@ class FirebaseGlobalLeaderboard {
                 firebaseScores.reverse();
             }
 
-            // When Firebase is available, prioritize Firebase data only
-            // Only include unsynced local scores (scores not yet uploaded to Firebase)
-            const localScores = this.getLocalLeaderboard(gameName);
-            const unsyncedLocalScores = localScores.filter(score => !score.synced);
-            const mergedScores = this.mergeScores(firebaseScores, unsyncedLocalScores);
+            // When Firebase is available, show ONLY Firebase data for consistency
+            // This ensures the count matches exactly what's in Firebase
+            console.log(`Using pure Firebase data for ${gameName}: ${firebaseScores.length} entries`);
+            
+            // Don't merge local scores when Firebase is working to avoid count confusion
+            const mergedScores = firebaseScores;
             
             // Sort based on game type
             mergedScores.sort((a, b) => this.compareScores(a, b, gameName));
@@ -199,8 +200,8 @@ class FirebaseGlobalLeaderboard {
             // Cache for offline access
             this.saveLocalLeaderboard(gameName + '_firebase_cache', result);
             
-            console.log(`✅ Firebase sync complete for ${gameName}:`, result.length, 'entries displayed');
-            console.log('Leaderboard entries:', result.map(r => `${r.name}: ${r.score}`));
+            console.log(`✅ Firebase sync complete for ${gameName}:`, result.length, 'entries displayed (pure Firebase)');
+            console.log('Firebase entries:', result.map(r => `${r.name}: ${r.score}`));
             return result;
             
         } catch (error) {
@@ -403,7 +404,7 @@ class FirebaseGlobalLeaderboard {
             }
         });
 
-        console.log(`Merging scores: ${firebaseScores.length} Firebase + ${localScores.length} unsynced local = ${allScores.length} total`);
+        console.log(`Merging scores: ${firebaseScores.length} Firebase + ${localScores.length} local = ${allScores.length} total`);
         const deduplicated = this.removeDuplicates(allScores);
         console.log(`After deduplication: ${deduplicated.length} entries`);
         return deduplicated;
