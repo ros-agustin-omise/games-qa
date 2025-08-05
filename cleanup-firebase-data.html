@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Data Cleanup Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .game-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .game-title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .cleanup-btn {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .cleanup-btn:hover {
+            background: #c0392b;
+        }
+        .cleanup-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .analyze-btn {
+            background: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .analyze-btn:hover {
+            background: #2980b9;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        .status.info {
+            background: #d5f4e6;
+            border: 1px solid #27ae60;
+            color: #1e8449;
+        }
+        .status.warning {
+            background: #fef9e7;
+            border: 1px solid #f39c12;
+            color: #b7950b;
+        }
+        .status.error {
+            background: #fadbd8;
+            border: 1px solid #e74c3c;
+            color: #a93226;
+        }
+        .data-preview {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .master-controls {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+        }
+        .master-controls h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        .danger-btn {
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .danger-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Firebase Leaderboard Data Cleanup Tool</h1>
+        
+        <div id="connectionStatus" class="status info">
+            🔄 Connecting to Firebase...
+        </div>
+
+        <div class="master-controls">
+            <h3>⚠️ Master Controls</h3>
+            <p>Use these to clean all games at once. <strong>BE CAREFUL!</strong></p>
+            <button class="analyze-btn" onclick="analyzeAllGames()">🔍 Analyze All Games</button>
+            <button class="danger-btn" onclick="cleanupAllGames()" id="cleanupAllBtn" disabled>
+                🗑️ Cleanup All Games (Keep Top 10)
+            </button>
+        </div>
+
+        <div id="gamesContainer">
+            <!-- Game sections will be dynamically generated -->
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration - matches your project
+        const firebaseConfig = {
+            apiKey: "AIzaSyAF_BGwl2SSPbnsyVGB9T2cHl3rR0KiyQs",
+            authDomain: "games-qa-prod.firebaseapp.com",
+            databaseURL: "https://games-qa-prod-default-rtdb.firebaseio.com/",
+            projectId: "games-qa-prod",
+            storageBucket: "games-qa-prod.firebasestorage.app",
+            messagingSenderId: "871171350020",
+            appId: "1:871171350020:web:93581c31a80657b3985f51",
+            measurementId: "G-K549VCVLMJ"
+        };
+
+        // Initialize Firebase
+        let database;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            document.getElementById('connectionStatus').innerHTML = '✅ Connected to Firebase successfully!';
+        } catch (error) {
+            document.getElementById('connectionStatus').innerHTML = `❌ Firebase connection failed: ${error.message}`;
+            document.getElementById('connectionStatus').className = 'status error';
+        }
+
+        const games = [
+            'rock-paper-scissors',
+            'memory-match', 
+            'number-guessing',
+            'word-scramble',
+            'spot-the-difference',
+            'test-case-designer'
+        ];
+
+        // Generate game sections
+        function generateGameSections() {
+            const container = document.getElementById('gamesContainer');
+            container.innerHTML = games.map(game => `
+                <div class="game-section" id="section-${game}">
+                    <div class="game-title">🎮 ${game.replace(/-/g, ' ').toUpperCase()}</div>
+                    <button class="analyze-btn" onclick="analyzeGame('${game}')">🔍 Analyze Data</button>
+                    <button class="cleanup-btn" onclick="cleanupGame('${game}')" id="cleanup-${game}" disabled>
+                        🗑️ Cleanup (Keep Top 10)
+                    </button>
+                    <div id="status-${game}"></div>
+                    <div id="preview-${game}"></div>
+                </div>
+            `).join('');
+        }
+
+        // Analyze data for a specific game
+        async function analyzeGame(gameName) {
+            const statusDiv = document.getElementById(`status-${gameName}`);
+            const previewDiv = document.getElementById(`preview-${gameName}`);
+            
+            statusDiv.innerHTML = `<div class="status info">🔄 Analyzing ${gameName}...</div>`;
+            
+            try {
+                const leaderboardRef = database.ref(`leaderboards/${gameName}`);
+                const snapshot = await leaderboardRef.once('value');
+                
+                if (!snapshot.exists()) {
+                    statusDiv.innerHTML = `<div class="status warning">⚠️ No data found for ${gameName}</div>`;
+                    return;
+                }
+
+                const data = snapshot.val();
+                const entries = Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                }));
+
+                // Sort by score (descending for most games)
+                const lowScoreGames = ['memory-match', 'spot-the-difference'];
+                entries.sort((a, b) => {
+                    if (lowScoreGames.includes(gameName)) {
+                        return a.score - b.score; // Ascending (lower is better)
+                    } else {
+                        return b.score - a.score; // Descending (higher is better)
+                    }
+                });
+
+                const totalEntries = entries.length;
+                const entriesToKeep = Math.min(10, totalEntries);
+                const entriesToDelete = Math.max(0, totalEntries - 10);
+
+                statusDiv.innerHTML = `
+                    <div class="status info">
+                        📊 Found ${totalEntries} entries<br>
+                        ✅ Will keep: ${entriesToKeep} entries<br>
+                        ${entriesToDelete > 0 ? `🗑️ Will delete: ${entriesToDelete} entries` : '✨ Already optimized!'}
+                    </div>
+                `;
+
+                // Show preview of top entries
+                const topEntries = entries.slice(0, 5);
+                previewDiv.innerHTML = `
+                    <div class="data-preview">
+                        <strong>Top 5 entries (will be kept):</strong><br>
+                        ${topEntries.map((entry, index) => 
+                            `${index + 1}. ${entry.name || 'Anonymous'}: ${entry.score} (${new Date(entry.timestamp).toLocaleDateString()})`
+                        ).join('<br>')}
+                    </div>
+                `;
+
+                // Enable cleanup button if there's data to clean
+                document.getElementById(`cleanup-${gameName}`).disabled = entriesToDelete === 0;
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Error analyzing ${gameName}: ${error.message}</div>`;
+            }
+        }
+
+        // Cleanup data for a specific game
+        async function cleanupGame(gameName) {
+            const statusDiv = document.getElementById(`status-${gameName}`);
+            
+            if (!confirm(`Are you sure you want to cleanup ${gameName} leaderboard? This will keep only the top 10 entries and delete the rest. This action cannot be undone!`)) {
+                return;
+            }
+
+            statusDiv.innerHTML = `<div class="status info">🔄 Cleaning up ${gameName}...</div>`;
+            
+            try {
+                const leaderboardRef = database.ref(`leaderboards/${gameName}`);
+                const snapshot = await leaderboardRef.once('value');
+                
+                if (!snapshot.exists()) {
+                    statusDiv.innerHTML = `<div class="status warning">⚠️ No data found for ${gameName}</div>`;
+                    return;
+                }
+
+                const data = snapshot.val();
+                const entries = Object.entries(data).map(([key, value]) => ({
+                    id: key,
+                    ...value
+                }));
+
+                // Sort by score
+                const lowScoreGames = ['memory-match', 'spot-the-difference'];
+                entries.sort((a, b) => {
+                    if (lowScoreGames.includes(gameName)) {
+                        return a.score - b.score; // Ascending (lower is better)
+                    } else {
+                        return b.score - a.score; // Descending (higher is better)
+                    }
+                });
+
+                const entriesToKeep = entries.slice(0, 10);
+                const entriesToDelete = entries.slice(10);
+
+                // Delete old data first
+                await leaderboardRef.remove();
+
+                // Add back only top 10 entries
+                const updates = {};
+                entriesToKeep.forEach(entry => {
+                    const { id, ...entryData } = entry;
+                    updates[id] = entryData;
+                });
+
+                if (Object.keys(updates).length > 0) {
+                    await leaderboardRef.update(updates);
+                }
+
+                statusDiv.innerHTML = `
+                    <div class="status info">
+                        ✅ Cleanup completed for ${gameName}!<br>
+                        📊 Kept: ${entriesToKeep.length} entries<br>
+                        🗑️ Deleted: ${entriesToDelete.length} entries
+                    </div>
+                `;
+
+                // Disable cleanup button
+                document.getElementById(`cleanup-${gameName}`).disabled = true;
+
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">❌ Cleanup failed for ${gameName}: ${error.message}</div>`;
+            }
+        }
+
+        // Analyze all games
+        async function analyzeAllGames() {
+            for (const game of games) {
+                await analyzeGame(game);
+                // Small delay to avoid overwhelming Firebase
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            // Enable master cleanup button
+            document.getElementById('cleanupAllBtn').disabled = false;
+        }
+
+        // Cleanup all games
+        async function cleanupAllGames() {
+            if (!confirm('Are you sure you want to cleanup ALL game leaderboards? This will keep only the top 10 entries for each game and delete the rest. This action cannot be undone!')) {
+                return;
+            }
+
+            for (const game of games) {
+                await cleanupGame(game);
+                // Small delay between games
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            alert('✅ All games have been cleaned up successfully!');
+        }
+
+        // Initialize the page
+        generateGameSections();
+    </script>
+</body>
+</html>
