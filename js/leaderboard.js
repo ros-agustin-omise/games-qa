@@ -152,7 +152,6 @@ class Leaderboard {
                 </div>
                 <div class="modal-buttons">
                     <button class="modal-btn primary" id="closeLeaderboard">Close</button>
-                    <button class="modal-btn secondary" id="clearLeaderboard">Clear All</button>
                 </div>
             </div>
         `;
@@ -164,12 +163,7 @@ class Leaderboard {
             document.body.removeChild(modal);
         });
 
-        document.getElementById('clearLeaderboard').addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear the leaderboard?')) {
-                localStorage.removeItem(`leaderboard_${gameName}`);
-                document.body.removeChild(modal);
-            }
-        });
+
 
         // Close on background click
         modal.addEventListener('click', (e) => {
