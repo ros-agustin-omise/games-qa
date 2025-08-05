@@ -3,8 +3,20 @@ function openGame(gameName) {
     window.location.href = `games/${gameName}/index.html`;
 }
 
-// Add some interactive effects
+// Initialize Firebase Global Leaderboard
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Firebase Global Leaderboard
+    if (typeof FirebaseGlobalLeaderboard !== 'undefined') {
+        window.firebaseGlobalLeaderboard = new FirebaseGlobalLeaderboard();
+        console.log('✅ Firebase Global Leaderboard initialized on home page');
+    } else {
+        console.log('⚠️ Firebase Global Leaderboard not available, falling back to local leaderboards');
+    }
+    
+    // Initialize local leaderboard as fallback
+    if (typeof Leaderboard !== 'undefined') {
+        window.gameLeaderboard = new Leaderboard();
+    }
     // Add hover sound effect (optional)
     const gameCards = document.querySelectorAll('.game-card');
     
@@ -103,7 +115,7 @@ function showAllLeaderboards() {
             <div class="game-selector">
                 ${games.map(game => `
                     <button class="game-selector-btn" onclick="selectGameLeaderboard('${game}')">
-                        ${window.gameLeaderboard.getGameTitle(game)}
+                        ${window.firebaseGlobalLeaderboard ? window.firebaseGlobalLeaderboard.getGameTitle(game) : game.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </button>
                 `).join('')}
             </div>
@@ -128,7 +140,14 @@ function showAllLeaderboards() {
 
 function selectGameLeaderboard(gameName) {
     closeAllLeaderboards();
-    window.gameLeaderboard.showLeaderboard(gameName);
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.showLeaderboard(gameName);
+    } else if (window.gameLeaderboard) {
+        // Fallback to local leaderboard if Firebase not available
+        window.gameLeaderboard.showLeaderboard(gameName);
+    } else {
+        alert('Leaderboard system not available. Please refresh the page and try again.');
+    }
 }
 
 function closeAllLeaderboards() {
