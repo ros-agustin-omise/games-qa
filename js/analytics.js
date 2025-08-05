@@ -82,6 +82,27 @@
         }
     }
 
+    // Generic event tracking
+    function trackEvent(eventName, data = {}) {
+        if (window.va) {
+            window.va('track', eventName, {
+                ...data,
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+
+    // Track page views
+    function trackPageView(pageName) {
+        if (window.va) {
+            window.va('track', 'Page View', {
+                page: pageName,
+                url: window.location.pathname,
+                timestamp: new Date().toISOString()
+            });
+        }
+    }
+
     // Export functions to global scope
     window.analytics = {
         init: initAnalytics,
@@ -90,7 +111,9 @@
         trackHighScore: trackHighScore,
         trackGameView: trackGameView,
         trackInteraction: trackInteraction,
-        trackLeaderboardView: trackLeaderboardView
+        trackLeaderboardView: trackLeaderboardView,
+        trackEvent: trackEvent,
+        trackPageView: trackPageView
     };
 
     // Auto-initialize when script loads
