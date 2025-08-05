@@ -292,9 +292,13 @@ function completeLevel() {
             details: gameDetails,
             scoreType: 'low'
         })
-            .then(result => {
-                showCompletionScreen(finalScore, minutes, seconds, isNewRecord, result.submitted ? result.playerName : null);
-            });
+                    .then(result => {
+            showCompletionScreen(finalScore, minutes, seconds, isNewRecord, result && result.submitted ? result.playerName : null);
+        })
+        .catch(error => {
+            console.warn('Leaderboard submission error:', error);
+            showCompletionScreen(finalScore, minutes, seconds, isNewRecord, null);
+        });
     } else {
         showCompletionScreen(finalScore, minutes, seconds, isNewRecord);
     }

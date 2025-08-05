@@ -1779,9 +1779,13 @@ function completeGame() {
             score: finalScore,
             details: gameDetails
         })
-            .then(result => {
-                showFinalResults(finalScore, playTime, efficiency, result.submitted ? result.playerName : null);
-            });
+                    .then(result => {
+            showFinalResults(finalScore, playTime, efficiency, result && result.submitted ? result.playerName : null);
+        })
+        .catch(error => {
+            console.warn('Leaderboard submission error:', error);
+            showFinalResults(finalScore, playTime, efficiency, null);
+        });
     } else {
         showFinalResults(finalScore, playTime, efficiency);
     }
