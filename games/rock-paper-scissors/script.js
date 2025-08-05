@@ -208,11 +208,11 @@ function checkTournamentEnd() {
 }
 
 function submitToLeaderboard() {
-    if (typeof leaderboard !== 'undefined') {
+    if (typeof globalLeaderboard !== 'undefined') {
         const totalGames = playerScore + computerScore + drawScore;
         const winRate = totalGames > 0 ? Math.round((playerScore / totalGames) * 100) : 0;
         
-        leaderboard.submitScore('rock-paper-scissors', {
+        globalLeaderboard.submitScore('rock-paper-scissors', {
             score: playerScore,
             details: {
                 wins: playerScore,
@@ -220,15 +220,14 @@ function submitToLeaderboard() {
                 draws: drawScore,
                 winRate: winRate + '%',
                 totalGames: totalGames
-            },
-            playerName: 'Player'
+            }
         });
     }
 }
 
 function showGameLeaderboard() {
-    if (typeof leaderboard !== 'undefined') {
-        leaderboard.showLeaderboard('rock-paper-scissors');
+    if (typeof globalLeaderboard !== 'undefined') {
+        globalLeaderboard.showLeaderboard('rock-paper-scissors');
     }
 }
 
