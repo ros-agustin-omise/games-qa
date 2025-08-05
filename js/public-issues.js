@@ -125,11 +125,6 @@ class PublicIssueTracker {
                         <h3 class="issue-title">
                             ${typeEmojis[issue.type] || '❓'} ${this.escapeHtml(issue.title)}
                         </h3>
-                        <div class="issue-quick-meta">
-                            <span>🎮 ${gameEmojis[issue.game] || '🎮'} ${this.getGameTitle(issue.game)}</span>
-                            <span>👤 ${this.escapeHtml(issue.reportedBy)}</span>
-                            <span>📅 ${createdDate}</span>
-                        </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <span class="issue-status-badge status-${issue.status}">${issue.status}</span>
