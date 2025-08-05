@@ -248,27 +248,28 @@
 
 /* Leaderboard Button */
 .leaderboard-button {
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: 12px 24px;
+    border-radius: 25px;
     cursor: pointer;
-    font-size: 1rem;
     font-weight: bold;
-    margin: 5px;
+    text-decoration: none;
+    display: inline-block;
     transition: all 0.3s ease;
+    font-size: 0.9em;
+    margin: 10px 5px;
     min-width: 140px;
-    box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
 }
 
 .leaderboard-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 .leaderboard-button:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
 }
 
 /* Game Selector */
