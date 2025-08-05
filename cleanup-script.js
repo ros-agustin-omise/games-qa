@@ -40,7 +40,7 @@ const games = [
     'test-case-designer'
 ];
 
-const lowScoreGames = ['memory-match', 'spot-the-difference'];
+const lowScoreGames = ['spot-the-difference'];
 
 async function initializeFirebase() {
     try {

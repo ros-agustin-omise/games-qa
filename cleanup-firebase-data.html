@@ -223,7 +223,7 @@
                 }));
 
                 // Sort by score (descending for most games)
-                const lowScoreGames = ['memory-match', 'spot-the-difference'];
+                const lowScoreGames = ['spot-the-difference'];
                 entries.sort((a, b) => {
                     if (lowScoreGames.includes(gameName)) {
                         return a.score - b.score; // Ascending (lower is better)
@@ -289,7 +289,7 @@
                 }));
 
                 // Sort by score
-                const lowScoreGames = ['memory-match', 'spot-the-difference'];
+                const lowScoreGames = ['spot-the-difference'];
                 entries.sort((a, b) => {
                     if (lowScoreGames.includes(gameName)) {
                         return a.score - b.score; // Ascending (lower is better)

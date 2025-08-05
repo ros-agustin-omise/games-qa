@@ -170,12 +170,12 @@ function gameWon() {
         window.analytics.trackGameComplete('memory-match', finalScore, 'completed');
     }
     
-    // Check for leaderboard qualification (lower moves is better)
+    // Check for leaderboard qualification (higher score is better)
     if (window.globalLeaderboard) {
         window.globalLeaderboard.submitScore('memory-match', {
             score: finalScore,
             details: gameDetails,
-            scoreType: 'low'
+            scoreType: 'high'
         })
             .then(result => {
                 showWinMessage(moves, finalTime, result.submitted ? result.playerName : null);

@@ -319,7 +319,7 @@ class FirebaseGlobalLeaderboard {
 
     // Score comparison logic
     compareScores(a, b, gameName) {
-        const lowScoreGames = ['memory-match', 'spot-the-difference'];
+        const lowScoreGames = ['spot-the-difference'];
         
         if (lowScoreGames.includes(gameName)) {
             return a.score - b.score; // Ascending (lower is better)
