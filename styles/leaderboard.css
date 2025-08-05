@@ -391,6 +391,25 @@
     margin-left: 8px;
 }
 
+.device-badge {
+    background: #2196F3;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.offline-notice {
+    color: #ff9800;
+    font-size: 0.75rem;
+    font-style: italic;
+    background: rgba(255, 152, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
 .leaderboard-actions {
     display: flex;
     gap: 10px;
