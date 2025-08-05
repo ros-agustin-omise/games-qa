@@ -171,15 +171,26 @@ function gameWon() {
     }
     
     // Check for leaderboard qualification (higher score is better)
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.submitScore('memory-match', {
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.submitScore('memory-match', {
             score: finalScore,
             details: gameDetails,
             scoreType: 'high'
         })
             .then(result => {
-                showWinMessage(moves, finalTime, result.submitted ? result.playerName : null);
+                showWinMessage(moves, finalTime, result && result.submitted ? result.playerName : null);
             });
+    } else if (window.gameLeaderboard) {
+        // Fallback to local leaderboard
+        const qualifies = window.gameLeaderboard.qualifiesForLeaderboard('memory-match', finalScore);
+        if (qualifies) {
+            window.gameLeaderboard.showNameInput('memory-match', finalScore, gameDetails, 'high')
+                .then(result => {
+                    showWinMessage(moves, finalTime, result ? result.playerName : null);
+                });
+        } else {
+            showWinMessage(moves, finalTime);
+        }
     } else {
         showWinMessage(moves, finalTime);
     }
@@ -259,13 +270,31 @@ function saveBestTime(moves, time) {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.globalLeaderboard) {
-        window.globalLeaderboard.showLeaderboard('memory-match');
+    if (window.firebaseGlobalLeaderboard) {
+        window.firebaseGlobalLeaderboard.showLeaderboard('memory-match');
+    } else if (window.gameLeaderboard) {
+        // Fallback to local leaderboard if Firebase not available
+        window.gameLeaderboard.showLeaderboard('memory-match');
+    } else {
+        alert('Leaderboard system not available. Please refresh the page and try again.');
     }
 }
 
 // Initialize the game
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Firebase Global Leaderboard
+    if (typeof FirebaseGlobalLeaderboard !== 'undefined') {
+        window.firebaseGlobalLeaderboard = new FirebaseGlobalLeaderboard();
+        console.log('✅ Firebase Global Leaderboard initialized for Memory Match');
+    } else {
+        console.log('⚠️ Firebase Global Leaderboard not available, falling back to local leaderboards');
+    }
+    
+    // Initialize local leaderboard as fallback
+    if (typeof Leaderboard !== 'undefined') {
+        window.gameLeaderboard = new Leaderboard();
+    }
+    
     // Track game view
     if (window.analytics) {
         window.analytics.trackGameView('memory-match');
