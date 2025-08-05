@@ -167,9 +167,11 @@ class FirebaseGlobalLeaderboard {
                 firebaseScores.reverse();
             }
 
-            // Merge with local scores
+            // When Firebase is available, prioritize Firebase data only
+            // Only include unsynced local scores (scores not yet uploaded to Firebase)
             const localScores = this.getLocalLeaderboard(gameName);
-            const mergedScores = this.mergeScores(firebaseScores, localScores);
+            const unsyncedLocalScores = localScores.filter(score => !score.synced);
+            const mergedScores = this.mergeScores(firebaseScores, unsyncedLocalScores);
             
             // Sort based on game type
             mergedScores.sort((a, b) => this.compareScores(a, b, gameName));
@@ -270,7 +272,8 @@ class FirebaseGlobalLeaderboard {
             const firebaseEntry = {
                 ...entry,
                 timestamp: this.firebase.database.ServerValue.TIMESTAMP,
-                synced: true
+                synced: true,
+                source: 'firebase'
             };
 
             // Push to Firebase (auto-generates unique key)
@@ -279,9 +282,12 @@ class FirebaseGlobalLeaderboard {
             
             console.log(`✅ Score synced to Firebase for ${gameName}:`, newEntryRef.key);
 
-            // Update local cache
+            // Update local cache and clean up synced scores
             const updatedLeaderboard = await this.getGlobalLeaderboard(gameName);
             this.saveLocalLeaderboard(gameName + '_firebase_cache', updatedLeaderboard);
+            
+            // Mark local score as synced or remove it since it's now in Firebase
+            this.cleanupSyncedLocalScores(gameName, entry);
 
             // Track analytics
             if (window.analytics) {
@@ -297,19 +303,33 @@ class FirebaseGlobalLeaderboard {
         }
     }
 
-    // Get offline leaderboard (demo + local + cached)
+    // Get offline leaderboard (prioritize cached Firebase, then local, then demo)
     getOfflineLeaderboard(gameName) {
-        const demoData = JSON.parse(localStorage.getItem('firebaseLeaderboardDemo') || '{}');
-        const demoScores = demoData[gameName] || [];
-        const localScores = this.getLocalLeaderboard(gameName);
         const cachedFirebase = this.getLocalLeaderboard(gameName + '_firebase_cache');
         
-        // Merge all available data
-        const allScores = [...demoScores, ...localScores, ...cachedFirebase];
-        const uniqueScores = this.removeDuplicates(allScores);
+        // If we have cached Firebase data, prioritize it
+        if (cachedFirebase && cachedFirebase.length > 0) {
+            console.log(`Using cached Firebase data for ${gameName}:`, cachedFirebase.length, 'entries');
+            
+            // Only add unsynced local scores to cached Firebase data
+            const localScores = this.getLocalLeaderboard(gameName);
+            const unsyncedLocalScores = localScores.filter(score => !score.synced);
+            
+            if (unsyncedLocalScores.length > 0) {
+                const merged = this.mergeScores(cachedFirebase, unsyncedLocalScores);
+                merged.sort((a, b) => this.compareScores(a, b, gameName));
+                return merged.slice(0, this.maxEntries);
+            }
+            
+            return cachedFirebase.slice(0, this.maxEntries);
+        }
         
-        uniqueScores.sort((a, b) => this.compareScores(a, b, gameName));
-        return uniqueScores.slice(0, this.maxEntries);
+        // Fallback: use local scores only (no demo data to avoid confusion)
+        const localScores = this.getLocalLeaderboard(gameName);
+        console.log(`No cached Firebase data, using local scores only for ${gameName}:`, localScores.length, 'entries');
+        
+        localScores.sort((a, b) => this.compareScores(a, b, gameName));
+        return localScores.slice(0, this.maxEntries);
     }
 
     // Local leaderboard management
@@ -322,6 +342,24 @@ class FirebaseGlobalLeaderboard {
     saveLocalLeaderboard(gameName, leaderboard) {
         const key = `leaderboard_${gameName}`;
         localStorage.setItem(key, JSON.stringify(leaderboard));
+    }
+    
+    // Clean up local scores that have been synced to Firebase
+    cleanupSyncedLocalScores(gameName, syncedEntry) {
+        const localScores = this.getLocalLeaderboard(gameName);
+        const filteredScores = localScores.filter(score => {
+            // Keep scores that haven't been synced or don't match the synced entry
+            return !score.synced && !(
+                score.name === syncedEntry.name && 
+                score.score === syncedEntry.score &&
+                Math.abs((score.timestamp || 0) - (syncedEntry.timestamp || 0)) < 30000
+            );
+        });
+        
+        if (filteredScores.length !== localScores.length) {
+            console.log(`Cleaned up ${localScores.length - filteredScores.length} synced local scores for ${gameName}`);
+            this.saveLocalLeaderboard(gameName, filteredScores);
+        }
     }
 
     addScoreLocal(gameName, entry) {
@@ -365,7 +403,7 @@ class FirebaseGlobalLeaderboard {
             }
         });
 
-        console.log(`Merging scores: ${firebaseScores.length} Firebase + ${localScores.length} local = ${allScores.length} total`);
+        console.log(`Merging scores: ${firebaseScores.length} Firebase + ${localScores.length} unsynced local = ${allScores.length} total`);
         const deduplicated = this.removeDuplicates(allScores);
         console.log(`After deduplication: ${deduplicated.length} entries`);
         return deduplicated;
@@ -506,10 +544,10 @@ class FirebaseGlobalLeaderboard {
                 <div class="leaderboard-header">
                     <h2>🏆 ${this.getGameTitle(gameName)} Leaderboard</h2>
                     <div class="leaderboard-type">
-                        <span class="firebase-badge">🔥 ${this.offlineMode ? 'Cached Firebase' : 'Live Firebase'} Global</span>
-                        <span class="player-count">${leaderboard.length} players worldwide</span>
+                        <span class="firebase-badge">🔥 ${this.offlineMode ? 'Cached Firebase Data' : 'Live Firebase Global'}</span>
+                        <span class="player-count">${leaderboard.length} ${this.offlineMode ? 'cached' : 'live'} entries</span>
                         <span class="realtime-indicator">⚡ Real-time sync active</span>
-                        ${this.offlineMode ? '<span class="offline-notice">📱 Offline - will sync when online</span>' : ''}
+                        ${this.offlineMode ? '<span class="offline-notice">📱 Showing cached data - will refresh when online</span>' : '<span class="online-notice">⚡ Real-time global data</span>'}
                     </div>
                 </div>
                 <div class="leaderboard-list" id="leaderboardList">
