@@ -152,7 +152,8 @@ class FirebaseGlobalLeaderboard {
 
         try {
             const leaderboardRef = this.database.ref(`leaderboards/${gameName}`);
-            const snapshot = await leaderboardRef.orderByChild('score').limitToLast(this.maxEntries).once('value');
+            // Get more entries from Firebase to account for potential filtering
+            const snapshot = await leaderboardRef.orderByChild('score').limitToLast(20).once('value');
             
             let firebaseScores = [];
             if (snapshot.exists()) {
@@ -172,12 +173,32 @@ class FirebaseGlobalLeaderboard {
             
             // Sort based on game type
             mergedScores.sort((a, b) => this.compareScores(a, b, gameName));
-            const result = mergedScores.slice(0, this.maxEntries);
+            let result = mergedScores.slice(0, this.maxEntries);
+            
+            // If we don't have enough entries, try to get more from Firebase
+            if (result.length < this.maxEntries && firebaseScores.length >= 20) {
+                console.log(`Only ${result.length} entries found, attempting to fetch more...`);
+                const largerSnapshot = await leaderboardRef.orderByChild('score').limitToLast(50).once('value');
+                if (largerSnapshot.exists()) {
+                    firebaseScores = [];
+                    largerSnapshot.forEach(childSnapshot => {
+                        firebaseScores.push({
+                            id: childSnapshot.key,
+                            ...childSnapshot.val()
+                        });
+                    });
+                    firebaseScores.reverse();
+                    const newMerged = this.mergeScores(firebaseScores, localScores);
+                    newMerged.sort((a, b) => this.compareScores(a, b, gameName));
+                    result = newMerged.slice(0, this.maxEntries);
+                }
+            }
             
             // Cache for offline access
             this.saveLocalLeaderboard(gameName + '_firebase_cache', result);
             
-            console.log(`✅ Firebase sync complete for ${gameName}:`, result.length, 'entries');
+            console.log(`✅ Firebase sync complete for ${gameName}:`, result.length, 'entries displayed');
+            console.log('Leaderboard entries:', result.map(r => `${r.name}: ${r.score}`));
             return result;
             
         } catch (error) {
@@ -336,7 +357,7 @@ class FirebaseGlobalLeaderboard {
             const exists = firebaseScores.some(firebaseScore => 
                 firebaseScore.name === localScore.name && 
                 firebaseScore.score === localScore.score &&
-                Math.abs((firebaseScore.timestamp || 0) - (localScore.timestamp || 0)) < 60000
+                Math.abs((firebaseScore.timestamp || 0) - (localScore.timestamp || 0)) < 30000
             );
             
             if (!exists) {
@@ -344,14 +365,19 @@ class FirebaseGlobalLeaderboard {
             }
         });
 
-        return this.removeDuplicates(allScores);
+        console.log(`Merging scores: ${firebaseScores.length} Firebase + ${localScores.length} local = ${allScores.length} total`);
+        const deduplicated = this.removeDuplicates(allScores);
+        console.log(`After deduplication: ${deduplicated.length} entries`);
+        return deduplicated;
     }
 
     removeDuplicates(scores) {
         const seen = new Set();
         return scores.filter(score => {
-            const key = `${score.name}-${score.score}-${Math.floor((score.timestamp || 0) / 60000)}`;
+            // Only remove actual duplicates: same player, same score, within 30 seconds
+            const key = `${score.name}-${score.score}-${Math.floor((score.timestamp || 0) / 30000)}`;
             if (seen.has(key)) {
+                console.log('Removing duplicate entry:', score.name, score.score);
                 return false;
             }
             seen.add(key);
