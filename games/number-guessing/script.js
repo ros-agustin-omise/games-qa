@@ -254,8 +254,8 @@ function playAgain() {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('number-guessing');
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.showLeaderboard('number-guessing');
     }
 }
 
@@ -276,8 +276,16 @@ function checkLeaderboardQualification() {
         win_rate: Math.round((gameStats.gamesWon / gameStats.totalGames) * 100) + '%'
     };
     
-    if (window.gameLeaderboard && window.gameLeaderboard.qualifiesForLeaderboard('number-guessing', finalScore)) {
-        window.gameLeaderboard.showNameInput('number-guessing', finalScore, gameDetails, 'high')
+    // Track game completion
+    if (window.analytics) {
+        window.analytics.trackGameComplete('number-guessing', finalScore, won ? 'won' : 'lost');
+    }
+    
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.submitScore('number-guessing', {
+            score: finalScore,
+            details: gameDetails
+        })
             .then(result => {
                 if (result.submitted) {
                     const resultDiv = document.getElementById('resultMessage');
@@ -305,6 +313,10 @@ function getDifficultyName() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('number-guessing');
+    }
     loadStats();
     
     // Allow Enter key to submit guess

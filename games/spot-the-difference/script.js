@@ -286,9 +286,12 @@ function completeLevel() {
         difficulty: levelConfigs[currentGame.level].name
     };
     
-    if (window.gameLeaderboard && window.gameLeaderboard.qualifiesForLeaderboard('spot-the-difference', finalScore)) {
-        // Show name input for leaderboard
-        window.gameLeaderboard.showNameInput('spot-the-difference', finalScore, gameDetails, 'high')
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.submitScore('spot-the-difference', {
+            score: finalScore,
+            details: gameDetails,
+            scoreType: 'low'
+        })
             .then(result => {
                 showCompletionScreen(finalScore, minutes, seconds, isNewRecord, result.submitted ? result.playerName : null);
             });
@@ -337,6 +340,11 @@ function nextLevel() {
 
 // Handle clicks outside difference spots (for user feedback)
 document.addEventListener('DOMContentLoaded', function() {
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('spot-the-difference');
+    }
+    
     // Add click handlers to game images for wrong clicks
     document.getElementById('imageA').addEventListener('click', handleWrongClick);
     document.getElementById('imageB').addEventListener('click', function(e) {
@@ -373,8 +381,8 @@ function handleWrongClick(e) {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('spot-the-difference');
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.showLeaderboard('spot-the-difference');
     }
 }
 

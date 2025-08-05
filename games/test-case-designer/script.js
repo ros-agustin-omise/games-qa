@@ -1774,8 +1774,11 @@ function completeGame() {
     };
     
     // Check for leaderboard qualification
-    if (window.gameLeaderboard && window.gameLeaderboard.qualifiesForLeaderboard('test-case-designer', finalScore)) {
-        window.gameLeaderboard.showNameInput('test-case-designer', finalScore, gameDetails, 'high')
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.submitScore('test-case-designer', {
+            score: finalScore,
+            details: gameDetails
+        })
             .then(result => {
                 showFinalResults(finalScore, playTime, efficiency, result.submitted ? result.playerName : null);
             });
@@ -1876,8 +1879,8 @@ function backToSelection() {
 }
 
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('test-case-designer');
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.showLeaderboard('test-case-designer');
     } else {
         alert('Leaderboard system not available');
     }
@@ -1885,6 +1888,11 @@ function showGameLeaderboard() {
 
 // Initialize game when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('test-case-designer');
+    }
+    
     // Add test-case-designer to leaderboard system
     if (window.gameLeaderboard && window.gameLeaderboard.getGameTitle) {
         const originalGetGameTitle = window.gameLeaderboard.getGameTitle;

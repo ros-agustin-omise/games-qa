@@ -311,8 +311,8 @@ function skipWord() {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('word-scramble');
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.showLeaderboard('word-scramble');
     }
 }
 
@@ -345,8 +345,16 @@ function checkLeaderboardQualification() {
         
         gameDetails.achievement = achievementText;
         
-        if (window.gameLeaderboard && window.gameLeaderboard.qualifiesForLeaderboard('word-scramble', currentGame.score)) {
-            window.gameLeaderboard.showNameInput('word-scramble', currentGame.score, gameDetails, 'high')
+        // Track achievement
+        if (window.analytics && achievementText) {
+            window.analytics.trackInteraction('achievement', 'word-scramble', { achievement: achievementText });
+        }
+        
+        if (window.globalLeaderboard) {
+            window.globalLeaderboard.submitScore('word-scramble', {
+                score: currentGame.score,
+                details: gameDetails
+            })
                 .then(result => {
                     if (result.submitted) {
                         const feedback = document.getElementById('feedbackMessage');
@@ -360,6 +368,10 @@ function checkLeaderboardQualification() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('word-scramble');
+    }
     loadStats();
     
     // Allow Enter key to submit answer

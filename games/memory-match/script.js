@@ -165,9 +165,18 @@ function gameWon() {
         pairs: totalPairs
     };
     
-    // Check for leaderboard qualification (higher score is better)
-    if (window.gameLeaderboard && window.gameLeaderboard.qualifiesForLeaderboard('memory-match', finalScore)) {
-        window.gameLeaderboard.showNameInput('memory-match', finalScore, gameDetails, 'high')
+    // Track game completion
+    if (window.analytics) {
+        window.analytics.trackGameComplete('memory-match', finalScore, 'completed');
+    }
+    
+    // Check for leaderboard qualification (lower moves is better)
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.submitScore('memory-match', {
+            score: finalScore,
+            details: gameDetails,
+            scoreType: 'low'
+        })
             .then(result => {
                 showWinMessage(moves, finalTime, result.submitted ? result.playerName : null);
             });
@@ -250,12 +259,16 @@ function saveBestTime(moves, time) {
 
 // Show leaderboard for this game
 function showGameLeaderboard() {
-    if (window.gameLeaderboard) {
-        window.gameLeaderboard.showLeaderboard('memory-match');
+    if (window.globalLeaderboard) {
+        window.globalLeaderboard.showLeaderboard('memory-match');
     }
 }
 
 // Initialize the game
 document.addEventListener('DOMContentLoaded', function() {
+    // Track game view
+    if (window.analytics) {
+        window.analytics.trackGameView('memory-match');
+    }
     showDifficultySelector();
 });
