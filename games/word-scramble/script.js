@@ -60,7 +60,8 @@ let currentGame = {
     timerInterval: null,
     wordsCompleted: 0,
     currentStreak: 0,
-    score: 0
+    score: 0,
+    usedWords: [] // Track words that have been used to prevent repeats
 };
 
 let gameStats = {
@@ -105,9 +106,13 @@ function startGame(difficulty) {
     currentGame.wordsCompleted = 0;
     currentGame.currentStreak = 0;
     currentGame.hintsUsed = 0;
+    currentGame.usedWords = []; // Reset used words for new game
     
     document.getElementById('difficultySelector').classList.add('hidden');
     document.getElementById('gamePlay').classList.remove('hidden');
+    
+    // Initialize progress display
+    updateWordProgress();
     
     loadNewWord();
     updateStatsDisplay();
@@ -115,8 +120,24 @@ function startGame(difficulty) {
 
 function loadNewWord() {
     const words = wordDatabase[currentGame.difficulty];
-    const randomIndex = Math.floor(Math.random() * words.length);
-    currentGame.currentWord = words[randomIndex];
+    
+    // Get available words (not yet used)
+    const availableWords = words.filter(word => 
+        !currentGame.usedWords.includes(word.word)
+    );
+    
+    // If all words have been used, show completion message and reset
+    if (availableWords.length === 0) {
+        showAllWordsCompleted();
+        return;
+    }
+    
+    // Select random word from available words
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    currentGame.currentWord = availableWords[randomIndex];
+    
+    // Add this word to used words
+    currentGame.usedWords.push(currentGame.currentWord.word);
     
     scrambleWord();
     updateWordDisplay();
@@ -133,6 +154,35 @@ function loadNewWord() {
     
     // Reset hint button
     document.getElementById('gameControls').querySelector('button').disabled = false;
+    
+    // Update progress indicator
+    updateWordProgress();
+}
+
+function showAllWordsCompleted() {
+    const words = wordDatabase[currentGame.difficulty];
+    const feedback = document.getElementById('feedbackMessage');
+    
+    feedback.textContent = `🎉 Amazing! You've completed all ${words.length} ${currentGame.difficulty} words! Starting over with fresh words...`;
+    feedback.className = 'feedback-message correct';
+    
+    // Reset used words and continue
+    setTimeout(() => {
+        currentGame.usedWords = [];
+        loadNewWord();
+    }, 3000);
+}
+
+function updateWordProgress() {
+    const words = wordDatabase[currentGame.difficulty];
+    const completed = currentGame.usedWords.length;
+    const total = words.length;
+    
+    // Update the word counter display if it exists
+    const progressElement = document.getElementById('wordProgress');
+    if (progressElement) {
+        progressElement.textContent = `Words: ${completed}/${total}`;
+    }
 }
 
 function scrambleWord() {
