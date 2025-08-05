@@ -2,11 +2,13 @@
 
 ## 🔧 **Working Rules (Apply These Now)**
 
-Your current Firebase rules are blocking score submissions. Here are **working rules** to fix the PERMISSION_DENIED error immediately:
+Your current Firebase rules are blocking score submissions and causing performance warnings. Here are **optimized working rules** to fix the PERMISSION_DENIED error and improve query performance:
 
-### **1. 🛠️ Simple Working Rules (Recommended)**
+### **1. 🛠️ Optimized Working Rules (Recommended)**
 
-Copy and paste these rules in your Firebase Console:
+Copy and paste these rules in your Firebase Console to fix permissions AND improve performance:
+
+**✨ NEW: Added `.indexOn` for better query performance!**
 
 ```json
 {
@@ -15,6 +17,7 @@ Copy and paste these rules in your Firebase Console:
       "$game": {
         ".read": true,
         ".write": true,
+        ".indexOn": "score",
         "$entry": {
           ".validate": "newData.hasChildren(['name', 'score']) && newData.child('name').isString() && newData.child('score').isNumber()"
         }
@@ -27,6 +30,13 @@ Copy and paste these rules in your Firebase Console:
   }
 }
 ```
+
+### **🎯 What This Fixes:**
+
+✅ **Permission Fix**: Allows read/write access to leaderboards  
+✅ **Performance Fix**: Added `.indexOn": "score"` for faster queries  
+✅ **No More Warnings**: Eliminates Firebase indexing warnings  
+✅ **Data Validation**: Ensures proper name/score format  
 
 ### **2. 🔥 Emergency Open Rules (If Above Doesn't Work)**
 
