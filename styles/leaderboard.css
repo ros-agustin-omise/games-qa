@@ -410,6 +410,75 @@
     border-radius: 10px;
 }
 
+.firebase-badge {
+    background: #FF5722;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.local-badge {
+    background: #607D8B;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.realtime-indicator {
+    color: #4CAF50;
+    font-size: 0.75rem;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.leaderboard-list.updated {
+    animation: updateFlash 0.5s ease-out;
+}
+
+@keyframes updateFlash {
+    0% { background: rgba(76, 175, 80, 0.1); }
+    100% { background: transparent; }
+}
+
+.firebase-status-info {
+    padding: 20px 0;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.status-online {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.status-offline {
+    color: #f44336;
+    font-weight: bold;
+}
+
+.status-info {
+    color: #2196F3;
+    font-weight: bold;
+}
+
 .leaderboard-actions {
     display: flex;
     gap: 10px;
