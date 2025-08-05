@@ -110,3 +110,5 @@ const analyticsBundle = `
 // Write the bundled file
 fs.writeFileSync(path.join(__dirname, 'js', 'analytics.js'), analyticsBundle);
 console.log('✅ Analytics bundle created successfully!');
+console.log('⚡ Speed Insights integrated and ready!');
+console.log('📊 Vercel Analytics + Speed Insights ready for deployment!');
