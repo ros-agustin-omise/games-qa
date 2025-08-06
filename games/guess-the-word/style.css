@@ -332,7 +332,7 @@ header p {
 #guessInput {
     flex: 1;
     padding: 15px 20px;
-    border: 2px solid #ddd;
+    border: 2px solid #16225b;
     border-radius: 10px;
     font-size: 1.2rem;
     text-align: center;
@@ -349,8 +349,8 @@ header p {
 }
 
 .action-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: white;
+    color: #16225b;
     border: none;
     padding: 15px 25px;
     border-radius: 10px;
@@ -543,50 +543,183 @@ header p {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+
+/* Large Desktop (1200px+) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px;
+        padding: 30px;
+    }
+    
+    .game-section {
+        padding: 40px;
+    }
+    
+    .word-display {
+        gap: 8px;
+    }
+    
+    .word-blank {
+        width: 50px;
+        height: 60px;
+        font-size: 2rem;
+        line-height: 60px;
+    }
+    
+    .clue-list {
+        gap: 20px;
+    }
+}
+
+/* iPad Pro and Large Tablets (1024px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1024px) {
+    .container {
+        max-width: 1000px;
+        padding: 25px;
+    }
+    
+    .game-section {
+        padding: 35px;
+    }
+    
+    .difficulty-options {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .difficulty-btn {
+        padding: 25px 20px;
+        min-height: 200px;
+    }
+    
+    .word-blank {
+        width: 45px;
+        height: 55px;
+        font-size: 1.8rem;
+        line-height: 55px;
+    }
+}
+
+/* iPad and Medium Tablets (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .game-section {
+        padding: 25px;
+    }
+    
+    .nav-buttons {
+        gap: 10px;
+    }
+    
+    .nav-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .difficulty-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .difficulty-btn {
+        padding: 20px 15px;
+        min-height: 180px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .word-blank {
+        width: 40px;
+        height: 50px;
+        font-size: 1.6rem;
+        line-height: 50px;
+    }
+    
+    .game-info {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .game-info > div {
+        min-width: 120px;
+    }
+    
+    .clue-list {
+        gap: 12px;
+    }
+    
+    .results-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* Mobile Large (481px - 767px) */
+@media (max-width: 767px) and (min-width: 481px) {
     .container {
         padding: 15px;
     }
     
     header h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
     
     header p {
-        font-size: 1rem;
+        font-size: 1.1rem;
     }
     
     .game-section {
         padding: 20px;
+        border-radius: 15px;
+    }
+    
+    .nav-buttons {
+        gap: 8px;
+    }
+    
+    .nav-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
     }
     
     .game-header {
         flex-direction: column;
         text-align: center;
+        gap: 15px;
     }
     
     .game-info {
         justify-content: center;
-        gap: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
     }
     
     .word-blank {
-        width: 35px;
-        height: 45px;
+        width: 38px;
+        height: 48px;
         font-size: 1.5rem;
-        line-height: 45px;
+        line-height: 48px;
     }
     
     .guess-input {
         flex-direction: column;
+        gap: 10px;
     }
     
     #guessInput {
-        margin-bottom: 10px;
+        margin-bottom: 0;
+        font-size: 1.1rem;
+        padding: 12px;
     }
     
     .results-stats {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
     
     .final-score {
@@ -595,34 +728,86 @@ header p {
     }
     
     .score-value {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
     }
     
     .difficulty-options {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
     
     .difficulty-btn {
         text-align: center;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
         min-height: auto;
-        padding: 20px;
+        padding: 18px;
+    }
+    
+    .clue-list {
+        gap: 10px;
+    }
+    
+    .clue-item {
+        padding: 12px;
     }
 }
 
+/* Mobile Small (320px - 480px) */
 @media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    header p {
+        font-size: 0.95rem;
+    }
+    
+    .game-section {
+        padding: 15px;
+        border-radius: 12px;
+    }
+    
+    .nav-buttons {
+        gap: 6px;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .nav-btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
+    }
+    
+    .setup-container h2 {
+        font-size: 1.6rem;
+    }
+    
     .word-blank {
-        width: 30px;
-        height: 40px;
-        font-size: 1.2rem;
-        line-height: 40px;
-        gap: 5px;
+        width: 32px;
+        height: 42px;
+        font-size: 1.3rem;
+        line-height: 42px;
+        margin: 0 2px;
+    }
+    
+    .word-display {
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .clue-item {
         flex-direction: column;
         text-align: center;
+        padding: 10px;
     }
     
     .clue-number {
@@ -631,13 +816,95 @@ header p {
         margin-right: 0;
     }
     
+    .clue-text {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
     .game-controls {
         flex-direction: column;
         align-items: center;
+        gap: 10px;
     }
     
     .control-btn {
         width: 100%;
         max-width: 250px;
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+    
+    #guessInput {
+        font-size: 1rem;
+        padding: 10px;
+    }
+    
+    .game-info {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .game-info > div {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .difficulty-btn {
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .difficulty-btn h3 {
+        font-size: 1.1rem;
+    }
+    
+    .difficulty-btn p {
+        font-size: 0.85rem;
+    }
+    
+    .score-value {
+        font-size: 2.2rem;
+    }
+    
+    .final-score h3 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Extra Small Mobile (max 320px) */
+@media (max-width: 320px) {
+    .container {
+        padding: 8px;
+    }
+    
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .word-blank {
+        width: 28px;
+        height: 38px;
+        font-size: 1.1rem;
+        line-height: 38px;
+    }
+    
+    .nav-btn {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+    }
+    
+    .game-section {
+        padding: 12px;
+    }
+    
+    .clue-text {
+        font-size: 0.85rem;
+    }
+    
+    .control-btn {
+        font-size: 0.8rem;
+        padding: 8px;
     }
 }
