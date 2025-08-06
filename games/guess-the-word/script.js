@@ -790,11 +790,15 @@ function endGame() {
         clearInterval(currentGame.timerInterval);
     }
     
-    const totalTime = Math.floor((Date.now() - currentGame.startTime) / 1000);
+    // Calculate total time in seconds (ensure it's stored for tiebreaker)
+    const totalTimeSeconds = Math.floor((Date.now() - currentGame.startTime) / 1000);
+    currentGame.totalTimeSeconds = totalTimeSeconds; // Store for leaderboard submission
+    
     const accuracy = Math.round((currentGame.wordsGuessed / currentGame.totalRounds) * 100);
     
     // Debug logging
     console.log('End game - Final score:', currentGame.score);
+    console.log('Total time in seconds:', totalTimeSeconds);
     console.log('Words guessed:', currentGame.wordsGuessed);
     console.log('Total rounds:', currentGame.totalRounds);
     
@@ -802,7 +806,7 @@ function endGame() {
     document.getElementById('finalScore').textContent = currentGame.score;
     document.getElementById('wordsGuessed').textContent = `${currentGame.wordsGuessed}/${currentGame.totalRounds}`;
     document.getElementById('accuracy').textContent = `${accuracy}%`;
-    document.getElementById('timeTaken').textContent = formatTime(totalTime);
+    document.getElementById('timeTaken').textContent = formatTime(totalTimeSeconds);
     document.getElementById('cluesUsed').textContent = currentGame.totalCluesUsed;
     
     // Show results
@@ -816,7 +820,7 @@ function endGame() {
             final_score: currentGame.score,
             words_guessed: currentGame.wordsGuessed,
             accuracy: accuracy,
-            total_time: totalTime,
+            total_time_seconds: totalTimeSeconds,
             clues_used: currentGame.totalCluesUsed
         });
     }
@@ -841,15 +845,20 @@ async function submitScore() {
         console.log('Is valid number:', !isNaN(finalScore) && isFinite(finalScore));
         console.log('Firebase available:', !!window.firebaseGlobalLeaderboard);
         
-        // Validate all required fields
+        // Validate all required fields and ensure time is properly calculated
+        const timeTakenSeconds = currentGame.totalTimeSeconds || Math.floor((Date.now() - (currentGame.startTime || Date.now())) / 1000);
+        
         const gameDetails = {
             difficulty: currentGame.difficulty || 'easy',
             words_guessed: currentGame.wordsGuessed || 0,
             total_rounds: currentGame.totalRounds || 1,
             accuracy: Math.round(((currentGame.wordsGuessed || 0) / (currentGame.totalRounds || 1)) * 100),
             clues_used: currentGame.totalCluesUsed || 0,
-            time_taken: Math.floor((Date.now() - (currentGame.startTime || Date.now())) / 1000)
+            time_taken: timeTakenSeconds, // Store time in seconds for tiebreaker
+            time_display: formatTime(timeTakenSeconds) // Human-readable format for display
         };
+        
+        console.log('Time taken for leaderboard (seconds):', timeTakenSeconds);
 
         console.log('Game details:', gameDetails);
 
