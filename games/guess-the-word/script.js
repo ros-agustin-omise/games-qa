@@ -752,8 +752,11 @@ async function submitScore() {
             
             const result = await window.firebaseGlobalLeaderboard.submitScore(
                 'guess-the-word',
-                finalScore,
-                gameDetails
+                {
+                    score: finalScore,
+                    details: gameDetails,
+                    scoreType: 'high'
+                }
             );
             
             console.log('Submit result:', result);

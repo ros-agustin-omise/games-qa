@@ -269,12 +269,20 @@ class FirebaseGlobalLeaderboard {
 
         try {
             // Create Firebase entry with server timestamp
+            console.log('Creating Firebase entry from:', entry);
+            
+            // Ensure all required fields are present and valid
             const firebaseEntry = {
-                ...entry,
+                name: entry.name || 'Anonymous',
+                score: Number(entry.score) || 0,
+                date: entry.date || new Date().toLocaleDateString(),
+                details: entry.details || {},
                 timestamp: this.firebase.database.ServerValue.TIMESTAMP,
                 synced: true,
                 source: 'firebase'
             };
+            
+            console.log('Firebase entry to save:', firebaseEntry);
 
             // Push to Firebase (auto-generates unique key)
             const leaderboardRef = this.database.ref(`leaderboards/${gameName}`);
