@@ -1809,6 +1809,11 @@ function showResults(results) {
             <span>💡 Hints Used:</span>
             <span>${currentGame.hintsUsed}</span>
         </div>
+        ${(results.wrongAnswerPenalty || 0) > 0 ? `
+        <div class="results-item penalty">
+            <span>❌ Wrong Answers Penalty:</span>
+            <span><strong>-${results.wrongAnswerPenalty} points</strong></span>
+        </div>` : ''}
         <div class="results-item">
             <span>📈 Total Score:</span>
             <span><strong>${currentGame.totalScore} points</strong></span>
