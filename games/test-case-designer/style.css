@@ -901,6 +901,38 @@
     transition: all 0.2s ease;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent; /* Remove blue highlight on mobile */
+    border: 2px solid #ddd;
+    background: #f8f9fa;
+    margin: 8px 0;
+}
+
+.test-option.distractor {
+    background: #fefefe;
+    border-color: #f0f0f0;
+}
+
+.test-option.wrong-selection {
+    background: #ffebee !important;
+    border-color: #f44336 !important;
+    animation: wrongShake 0.5s ease-in-out;
+}
+
+@keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.wrong-indicator {
+    margin-left: 8px;
+    color: #f44336;
+    font-weight: bold;
+    animation: wrongPulse 1s ease-in-out infinite;
+}
+
+@keyframes wrongPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 .test-option input[type="checkbox"] {
