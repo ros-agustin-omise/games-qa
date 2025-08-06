@@ -455,8 +455,10 @@ function submitGuess() {
     if (guess === currentGame.currentWord.word) {
         // Correct guess!
         const points = calculatePoints();
+        console.log('Points calculated:', points);
         currentGame.score += points;
         currentGame.wordsGuessed++;
+        console.log('New total score:', currentGame.score);
         
         showFeedback(`Correct! +${points} points`, 'success');
         
@@ -656,6 +658,11 @@ function endGame() {
     const totalTime = Math.floor((Date.now() - currentGame.startTime) / 1000);
     const accuracy = Math.round((currentGame.wordsGuessed / currentGame.totalRounds) * 100);
     
+    // Debug logging
+    console.log('End game - Final score:', currentGame.score);
+    console.log('Words guessed:', currentGame.wordsGuessed);
+    console.log('Total rounds:', currentGame.totalRounds);
+    
     // Update results display
     document.getElementById('finalScore').textContent = currentGame.score;
     document.getElementById('wordsGuessed').textContent = `${currentGame.wordsGuessed}/${currentGame.totalRounds}`;
@@ -691,6 +698,9 @@ function formatTime(seconds) {
 
 async function submitScore() {
     try {
+        console.log('Submitting score:', currentGame.score);
+        console.log('Firebase available:', !!window.firebaseGlobalLeaderboard);
+        
         const gameDetails = {
             difficulty: currentGame.difficulty,
             words_guessed: currentGame.wordsGuessed,
@@ -700,6 +710,8 @@ async function submitScore() {
             time_taken: Math.floor((Date.now() - currentGame.startTime) / 1000)
         };
 
+        console.log('Game details:', gameDetails);
+
         if (window.firebaseGlobalLeaderboard) {
             const result = await window.firebaseGlobalLeaderboard.submitScore(
                 'guess-the-word',
@@ -707,15 +719,20 @@ async function submitScore() {
                 gameDetails
             );
             
+            console.log('Submit result:', result);
+            
             if (result && result.submitted) {
                 console.log('Score submitted to global leaderboard');
             }
         } else if (window.globalLeaderboard) {
+            console.log('Using fallback leaderboard');
             await window.globalLeaderboard.submitScore(
                 'guess-the-word',
                 currentGame.score,
                 gameDetails
             );
+        } else {
+            console.error('No leaderboard system available');
         }
     } catch (error) {
         console.error('Error submitting score:', error);
