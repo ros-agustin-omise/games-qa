@@ -31,7 +31,7 @@ function showReportIssue() {
                         <option value="word-scramble">📝 Word Scramble</option>
                         <option value="rock-paper-scissors">✂️ Rock Paper Scissors</option>
                         <option value="test-case-designer">🧪 Test Case Designer</option>
-                        <option value="guess-the-word">🔤 Guess the Word</option>
+                        <option value="guess-the-word">🔍 Guess the Word</option>
                     </select>
                 </div>
                 
