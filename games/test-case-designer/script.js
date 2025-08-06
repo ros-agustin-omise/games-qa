@@ -40,28 +40,43 @@ const testScenarios = {
             ],
             testCases: {
                 positive: [
-                    { id: 'p1', text: 'Valid username and password combination', points: 10, essential: true },
-                    { id: 'p2', text: 'Login with remember me checked', points: 5 },
-                    { id: 'p3', text: 'Login with special characters in password', points: 8 },
-                    { id: 'p4', text: 'Login with minimum length password (8 chars)', points: 8 }
+                    { id: 'p1', text: 'Valid username and password combination', points: 10, essential: true, correct: true },
+                    { id: 'p2', text: 'Login with remember me checked', points: 5, correct: true },
+                    { id: 'p3', text: 'Login with special characters in password', points: 8, correct: true },
+                    { id: 'p4', text: 'Login with minimum length password (8 chars)', points: 8, correct: true }
                 ],
                 negative: [
-                    { id: 'n1', text: 'Empty username field', points: 10, essential: true },
-                    { id: 'n2', text: 'Empty password field', points: 10, essential: true },
-                    { id: 'n3', text: 'Invalid username format', points: 8 },
-                    { id: 'n4', text: 'Wrong password for valid username', points: 12, essential: true }
+                    { id: 'n1', text: 'Empty username field', points: 10, essential: true, correct: true },
+                    { id: 'n2', text: 'Empty password field', points: 10, essential: true, correct: true },
+                    { id: 'n3', text: 'Invalid username format', points: 8, correct: true },
+                    { id: 'n4', text: 'Wrong password for valid username', points: 12, essential: true, correct: true }
                 ],
                 boundary: [
-                    { id: 'b1', text: 'Username with exactly 50 characters', points: 12 },
-                    { id: 'b2', text: 'Username with 51 characters', points: 15, essential: true },
-                    { id: 'b3', text: 'Password with exactly 8 characters', points: 10 },
-                    { id: 'b4', text: 'Password with 7 characters', points: 15, essential: true }
+                    { id: 'b1', text: 'Username with exactly 50 characters', points: 12, correct: true },
+                    { id: 'b2', text: 'Username with 51 characters', points: 15, essential: true, correct: true },
+                    { id: 'b3', text: 'Password with exactly 8 characters', points: 10, correct: true },
+                    { id: 'b4', text: 'Password with 7 characters', points: 15, essential: true, correct: true }
                 ],
                 security: [
-                    { id: 's1', text: 'SQL injection in username field', points: 20, essential: true },
-                    { id: 's2', text: 'Password field does not show plain text', points: 15, essential: true },
-                    { id: 's3', text: 'Account lockout after multiple failed attempts', points: 18 },
-                    { id: 's4', text: 'Session timeout after inactivity', points: 12 }
+                    { id: 's1', text: 'SQL injection in username field', points: 20, essential: true, correct: true },
+                    { id: 's2', text: 'Password field does not show plain text', points: 15, essential: true, correct: true },
+                    { id: 's3', text: 'Account lockout after multiple failed attempts', points: 18, correct: true },
+                    { id: 's4', text: 'Session timeout after inactivity', points: 12, correct: true }
+                ],
+                // Wrong answer choices (distractors)
+                distractors: [
+                    { id: 'd1', text: 'Test login button color changes on hover', points: -5, category: 'positive', correct: false },
+                    { id: 'd2', text: 'Verify login form loads within 0.1 seconds', points: -3, category: 'positive', correct: false },
+                    { id: 'd3', text: 'Check if username field accepts emojis', points: -4, category: 'positive', correct: false },
+                    { id: 'd4', text: 'Test login with future date as password', points: -6, category: 'negative', correct: false },
+                    { id: 'd5', text: 'Verify error message font size is 12px', points: -3, category: 'negative', correct: false },
+                    { id: 'd6', text: 'Test login form background color', points: -5, category: 'negative', correct: false },
+                    { id: 'd7', text: 'Username with exactly 49.5 characters', points: -4, category: 'boundary', correct: false },
+                    { id: 'd8', text: 'Password with medium complexity rating', points: -6, category: 'boundary', correct: false },
+                    { id: 'd9', text: 'Test if login works on Tuesdays only', points: -8, category: 'boundary', correct: false },
+                    { id: 'd10', text: 'Check if password field accepts images', points: -10, category: 'security', correct: false },
+                    { id: 'd11', text: 'Verify login form uses Comic Sans font', points: -4, category: 'security', correct: false },
+                    { id: 'd12', text: 'Test if username can be a phone number', points: -7, category: 'security', correct: false }
                 ]
             }
         },
@@ -683,13 +698,25 @@ function loadTestCaseOptions(testCases) {
             return;
         }
         
-        console.log(`Loading ${testCases[category].length} test cases for category: ${category}`);
+        // Combine correct test cases with wrong answers (distractors)
+        let allOptions = [...testCases[category]];
         
-        testCases[category].forEach(testCase => {
+        // Add distractors for this category
+        if (testCases.distractors) {
+            const categoryDistractors = testCases.distractors.filter(d => d.category === category);
+            allOptions = allOptions.concat(categoryDistractors);
+        }
+        
+        // Shuffle the options to randomize order
+        allOptions = shuffleArray(allOptions);
+        
+        console.log(`Loading ${allOptions.length} test cases (including distractors) for category: ${category}`);
+        
+        allOptions.forEach(testCase => {
             const option = document.createElement('div');
-            option.className = 'test-option';
+            option.className = `test-option ${testCase.correct === false ? 'distractor' : ''}`;
             option.innerHTML = `
-                <input type="checkbox" id="${testCase.id}" onchange="toggleTestCase('${testCase.id}', '${category}')">
+                <input type="checkbox" id="${testCase.id}" onchange="toggleTestCase('${testCase.id}', '${category}', ${testCase.correct !== false})">
                 <label for="${testCase.id}">${testCase.text}</label>
             `;
             container.appendChild(option);
@@ -697,19 +724,61 @@ function loadTestCaseOptions(testCases) {
     });
 }
 
-function toggleTestCase(testId, category) {
+// Utility function to shuffle array
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+function toggleTestCase(testId, category, isCorrect = true) {
     const checkbox = document.getElementById(testId);
     const option = checkbox.closest('.test-option');
     
     if (checkbox.checked) {
-        currentGame.selectedTestCases.push({ id: testId, category: category });
-        option.classList.add('selected');
+        currentGame.selectedTestCases.push({ 
+            id: testId, 
+            category: category, 
+            correct: isCorrect 
+        });
+        
+        if (isCorrect) {
+            option.classList.add('selected');
+            option.classList.remove('wrong-selection');
+        } else {
+            option.classList.add('selected', 'wrong-selection');
+            // Show immediate feedback for wrong selection
+            showWrongAnswerFeedback(option);
+        }
     } else {
         currentGame.selectedTestCases = currentGame.selectedTestCases.filter(tc => tc.id !== testId);
-        option.classList.remove('selected');
+        option.classList.remove('selected', 'wrong-selection');
     }
     
     updateCoverage();
+}
+
+function showWrongAnswerFeedback(option) {
+    // Add a temporary warning indicator
+    const warning = document.createElement('span');
+    warning.className = 'wrong-indicator';
+    warning.innerHTML = '⚠️';
+    warning.title = 'This is not a good test case for this scenario';
+    
+    const label = option.querySelector('label');
+    if (label && !label.querySelector('.wrong-indicator')) {
+        label.appendChild(warning);
+        
+        // Remove the warning after 3 seconds
+        setTimeout(() => {
+            if (warning.parentNode) {
+                warning.parentNode.removeChild(warning);
+            }
+        }, 3000);
+    }
 }
 
 // Custom Test Case Functions
@@ -1412,6 +1481,20 @@ function calculateQualityCoverage(allTestCases, selectedTestCases) {
     const categories = ['positive', 'negative', 'boundary', 'security'];
     let totalScore = 0;
     let maxPossibleScore = 0;
+    
+    // Calculate penalty for wrong selections
+    const wrongSelections = selectedTestCases.filter(tc => tc.correct === false);
+    let wrongAnswerPenalty = 0;
+    
+    wrongSelections.forEach(wrong => {
+        // Find the wrong answer in distractors to get penalty points
+        if (allTestCases.distractors) {
+            const distractor = allTestCases.distractors.find(d => d.id === wrong.id);
+            if (distractor) {
+                wrongAnswerPenalty += Math.abs(distractor.points); // Add penalty (points are negative)
+            }
+        }
+    });
     
     // Category coverage weights (ensures balanced testing approach)
     const categoryWeights = {
