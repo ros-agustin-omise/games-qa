@@ -640,7 +640,8 @@ class FirebaseGlobalLeaderboard {
             'number-guessing': 'Number Guessing',
             'word-scramble': 'Word Scramble',
             'spot-the-difference': 'Spot the Difference',
-            'test-case-designer': 'Test Case Designer'
+            'test-case-designer': 'Test Case Designer',
+            'guess-the-word': 'Guess the Word'
         };
         return titles[gameName] || gameName;
     }
@@ -652,7 +653,8 @@ class FirebaseGlobalLeaderboard {
             'number-guessing': 'points', 
             'word-scramble': 'points',
             'spot-the-difference': scoreType === 'low' ? 'seconds' : 'points',
-            'test-case-designer': 'points'
+            'test-case-designer': 'points',
+            'guess-the-word': 'points'
         };
         return labels[gameName] || 'points';
     }
