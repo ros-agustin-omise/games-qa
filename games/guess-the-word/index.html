@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Word - Playverse</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../styles/leaderboard.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="../../js/firebase-global-leaderboard.js"></script>
+    <script src="../../js/analytics.js"></script>
+    <script src="../../js/speed-insights.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔤 Guess the Word</h1>
+            <p>Use the clues to guess the hidden word!</p>
+            <div class="nav-buttons">
+                <a href="../../index.html" class="nav-btn">🏠 Home</a>
+                <button class="nav-btn" onclick="showGameLeaderboard()">🏆 Leaderboard</button>
+            </div>
+        </header>
+
+        <!-- Game Setup -->
+        <div id="gameSetup" class="game-section">
+            <div class="setup-container">
+                <h2>Choose Difficulty</h2>
+                <div class="difficulty-options">
+                    <button class="difficulty-btn" onclick="startGame('easy')">
+                        <div class="difficulty-icon">🌱</div>
+                        <div class="difficulty-info">
+                            <h3>Easy</h3>
+                            <p>4-6 letters • 5 clues • Common words</p>
+                        </div>
+                    </button>
+                    <button class="difficulty-btn" onclick="startGame('medium')">
+                        <div class="difficulty-icon">🌿</div>
+                        <div class="difficulty-info">
+                            <h3>Medium</h3>
+                            <p>6-8 letters • 4 clues • Moderate words</p>
+                        </div>
+                    </button>
+                    <button class="difficulty-btn" onclick="startGame('hard')">
+                        <div class="difficulty-icon">🌳</div>
+                        <div class="difficulty-info">
+                            <h3>Hard</h3>
+                            <p>8+ letters • 3 clues • Complex words</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Play -->
+        <div id="gamePlay" class="game-section hidden">
+            <div class="game-header">
+                <div class="game-info">
+                    <div class="info-item">
+                        <span class="info-label">Category:</span>
+                        <span id="category" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Score:</span>
+                        <span id="score" class="info-value">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Round:</span>
+                        <span id="currentRound" class="info-value">1</span>/<span id="totalRounds" class="info-value">10</span>
+                    </div>
+                </div>
+                <div class="timer-section">
+                    <span class="info-label">Time:</span>
+                    <span id="timer" class="timer">60s</span>
+                </div>
+            </div>
+
+            <div class="word-section">
+                <div class="word-display">
+                    <div id="wordBlanks" class="word-blanks"></div>
+                    <div class="word-length">
+                        Length: <span id="wordLength">0</span> letters
+                    </div>
+                </div>
+
+                <div class="clues-section">
+                    <h3>Clues:</h3>
+                    <div id="cluesList" class="clues-list"></div>
+                    <button id="revealClueBtn" class="action-btn" onclick="revealNextClue()">
+                        💡 Reveal Next Clue
+                    </button>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="guess-input">
+                    <input type="text" id="guessInput" placeholder="Type your guess..." maxlength="20">
+                    <button id="submitGuess" class="action-btn" onclick="submitGuess()">Submit Guess</button>
+                </div>
+                <div class="guess-feedback">
+                    <div id="feedbackMessage" class="feedback-message"></div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="control-btn" onclick="skipWord()">⏭️ Skip Word (-5 points)</button>
+                <button class="control-btn" onclick="pauseGame()">⏸️ Pause</button>
+                <button class="control-btn" onclick="quitGame()">🚪 Quit Game</button>
+            </div>
+        </div>
+
+        <!-- Game Results -->
+        <div id="gameResults" class="game-section hidden">
+            <div class="results-container">
+                <div class="results-header">
+                    <h2 id="resultsTitle">Game Complete!</h2>
+                    <div class="final-score">
+                        <span class="score-label">Final Score:</span>
+                        <span id="finalScore" class="score-value">0</span>
+                    </div>
+                </div>
+
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Words Guessed:</span>
+                        <span id="wordsGuessed" class="stat-value">0/10</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy:</span>
+                        <span id="accuracy" class="stat-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Time Taken:</span>
+                        <span id="timeTaken" class="stat-value">0:00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Clues Used:</span>
+                        <span id="cluesUsed" class="stat-value">0</span>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="action-btn" onclick="playAgain()">🔄 Play Again</button>
+                    <button class="action-btn" onclick="showGameLeaderboard()">🏆 View Leaderboard</button>
+                    <button class="action-btn" onclick="goHome()">🏠 Back to Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pauseMenu" class="modal hidden">
+            <div class="modal-content">
+                <h3>Game Paused</h3>
+                <p>Take a break! Your progress is saved.</p>
+                <div class="modal-buttons">
+                    <button class="action-btn" onclick="resumeGame()">▶️ Resume</button>
+                    <button class="action-btn" onclick="quitGame()">🚪 Quit Game</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
