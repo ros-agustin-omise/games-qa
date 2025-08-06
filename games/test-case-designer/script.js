@@ -93,28 +93,43 @@ const testScenarios = {
             ],
             testCases: {
                 positive: [
-                    { id: 'p1', text: 'Submit form with all required fields filled', points: 12, essential: true },
-                    { id: 'p2', text: 'Submit form with valid email format', points: 10, essential: true },
-                    { id: 'p3', text: 'Submit form without optional subject field', points: 8 },
-                    { id: 'p4', text: 'Submit form with special characters in message', points: 6 }
+                    { id: 'p1', text: 'Submit form with all required fields filled', points: 12, essential: true, correct: true },
+                    { id: 'p2', text: 'Submit form with valid email format', points: 10, essential: true, correct: true },
+                    { id: 'p3', text: 'Submit form without optional subject field', points: 8, correct: true },
+                    { id: 'p4', text: 'Submit form with special characters in message', points: 6, correct: true }
                 ],
                 negative: [
-                    { id: 'n1', text: 'Submit form without name', points: 12, essential: true },
-                    { id: 'n2', text: 'Submit form without email', points: 12, essential: true },
-                    { id: 'n3', text: 'Submit form without message', points: 12, essential: true },
-                    { id: 'n4', text: 'Submit form with invalid email format', points: 15, essential: true }
+                    { id: 'n1', text: 'Submit form without name', points: 12, essential: true, correct: true },
+                    { id: 'n2', text: 'Submit form without email', points: 12, essential: true, correct: true },
+                    { id: 'n3', text: 'Submit form without message', points: 12, essential: true, correct: true },
+                    { id: 'n4', text: 'Submit form with invalid email format', points: 15, essential: true, correct: true }
                 ],
                 boundary: [
-                    { id: 'b1', text: 'Message with exactly 500 characters', points: 10 },
-                    { id: 'b2', text: 'Message with 501 characters', points: 15, essential: true },
-                    { id: 'b3', text: 'Name field with very long input', points: 12 },
-                    { id: 'b4', text: 'Empty spaces only in required fields', points: 14 }
+                    { id: 'b1', text: 'Message with exactly 500 characters', points: 10, correct: true },
+                    { id: 'b2', text: 'Message with 501 characters', points: 15, essential: true, correct: true },
+                    { id: 'b3', text: 'Name field with very long input', points: 12, correct: true },
+                    { id: 'b4', text: 'Empty spaces only in required fields', points: 14, correct: true }
                 ],
                 security: [
-                    { id: 's1', text: 'HTML/Script injection in message field', points: 18, essential: true },
-                    { id: 's2', text: 'Email header injection attempt', points: 20 },
-                    { id: 's3', text: 'CSRF protection verification', points: 16 },
-                    { id: 's4', text: 'Rate limiting for form submissions', points: 14 }
+                    { id: 's1', text: 'HTML/Script injection in message field', points: 18, essential: true, correct: true },
+                    { id: 's2', text: 'Email header injection attempt', points: 20, correct: true },
+                    { id: 's3', text: 'CSRF protection verification', points: 16, correct: true },
+                    { id: 's4', text: 'Rate limiting for form submissions', points: 14, correct: true }
+                ],
+                // Wrong answer choices (distractors)
+                distractors: [
+                    { id: 'cd1', text: 'Test submit button hover animation speed', points: -4, category: 'positive', correct: false },
+                    { id: 'cd2', text: 'Verify form background gradient colors', points: -3, category: 'positive', correct: false },
+                    { id: 'cd3', text: 'Check if form works only on weekends', points: -6, category: 'positive', correct: false },
+                    { id: 'cd4', text: 'Test form submission with invisible characters', points: -5, category: 'negative', correct: false },
+                    { id: 'cd5', text: 'Verify error message appears in purple color', points: -3, category: 'negative', correct: false },
+                    { id: 'cd6', text: 'Test form with negative character count', points: -7, category: 'negative', correct: false },
+                    { id: 'cd7', text: 'Message with exactly 500.5 characters', points: -5, category: 'boundary', correct: false },
+                    { id: 'cd8', text: 'Email field accepts phone numbers only', points: -6, category: 'boundary', correct: false },
+                    { id: 'cd9', text: 'Test form on leap year dates only', points: -8, category: 'boundary', correct: false },
+                    { id: 'cd10', text: 'Check if form accepts image uploads in message', points: -9, category: 'security', correct: false },
+                    { id: 'cd11', text: 'Verify form uses Times New Roman font', points: -4, category: 'security', correct: false },
+                    { id: 'cd12', text: 'Test form submission during solar eclipses', points: -10, category: 'security', correct: false }
                 ]
             }
         }
@@ -133,30 +148,45 @@ const testScenarios = {
             ],
             testCases: {
                 positive: [
-                    { id: 'p1', text: 'Add single product to empty cart', points: 10, essential: true },
-                    { id: 'p2', text: 'Add multiple different products', points: 12 },
-                    { id: 'p3', text: 'Update product quantity to valid number', points: 15, essential: true },
-                    { id: 'p4', text: 'Remove product from cart', points: 12, essential: true },
-                    { id: 'p5', text: 'Cart total calculation with discounts', points: 18 }
+                    { id: 'p1', text: 'Add single product to empty cart', points: 10, essential: true, correct: true },
+                    { id: 'p2', text: 'Add multiple different products', points: 12, correct: true },
+                    { id: 'p3', text: 'Update product quantity to valid number', points: 15, essential: true, correct: true },
+                    { id: 'p4', text: 'Remove product from cart', points: 12, essential: true, correct: true },
+                    { id: 'p5', text: 'Cart total calculation with discounts', points: 18, correct: true }
                 ],
                 negative: [
-                    { id: 'n1', text: 'Add out-of-stock product to cart', points: 15, essential: true },
-                    { id: 'n2', text: 'Update quantity to zero', points: 12 },
-                    { id: 'n3', text: 'Add product with no price', points: 14 },
-                    { id: 'n4', text: 'Remove non-existent product', points: 10 }
+                    { id: 'n1', text: 'Add out-of-stock product to cart', points: 15, essential: true, correct: true },
+                    { id: 'n2', text: 'Update quantity to zero', points: 12, correct: true },
+                    { id: 'n3', text: 'Add product with no price', points: 14, correct: true },
+                    { id: 'n4', text: 'Remove non-existent product', points: 10, correct: true }
                 ],
                 boundary: [
-                    { id: 'b1', text: 'Add exactly 10 items of same product', points: 15 },
-                    { id: 'b2', text: 'Try to add 11th item of same product', points: 20, essential: true },
-                    { id: 'b3', text: 'Update quantity to maximum allowed (10)', points: 12 },
-                    { id: 'b4', text: 'Update quantity to negative number', points: 18, essential: true },
-                    { id: 'b5', text: 'Cart with maximum number of different products', points: 16 }
+                    { id: 'b1', text: 'Add exactly 10 items of same product', points: 15, correct: true },
+                    { id: 'b2', text: 'Try to add 11th item of same product', points: 20, essential: true, correct: true },
+                    { id: 'b3', text: 'Update quantity to maximum allowed (10)', points: 12, correct: true },
+                    { id: 'b4', text: 'Update quantity to negative number', points: 18, essential: true, correct: true },
+                    { id: 'b5', text: 'Cart with maximum number of different products', points: 16, correct: true }
                 ],
                 security: [
-                    { id: 's1', text: 'Manipulate product price in cart', points: 25, essential: true },
-                    { id: 's2', text: 'Access another user\'s cart', points: 22, essential: true },
-                    { id: 's3', text: 'Bypass maximum quantity limit', points: 20 },
-                    { id: 's4', text: 'Cart data encryption verification', points: 18 }
+                    { id: 's1', text: 'Manipulate product price in cart', points: 25, essential: true, correct: true },
+                    { id: 's2', text: 'Access another user\'s cart', points: 22, essential: true, correct: true },
+                    { id: 's3', text: 'Bypass maximum quantity limit', points: 20, correct: true },
+                    { id: 's4', text: 'Cart data encryption verification', points: 18, correct: true }
+                ],
+                // Wrong answer choices (distractors)
+                distractors: [
+                    { id: 'ecd1', text: 'Test cart icon animation when adding items', points: -4, category: 'positive', correct: false },
+                    { id: 'ecd2', text: 'Verify shopping cart button is blue colored', points: -3, category: 'positive', correct: false },
+                    { id: 'ecd3', text: 'Check if cart works only during business hours', points: -7, category: 'positive', correct: false },
+                    { id: 'ecd4', text: 'Add products with negative prices', points: -6, category: 'negative', correct: false },
+                    { id: 'ecd5', text: 'Test cart with imaginary product categories', points: -5, category: 'negative', correct: false },
+                    { id: 'ecd6', text: 'Remove products using voice commands', points: -8, category: 'negative', correct: false },
+                    { id: 'ecd7', text: 'Add exactly 10.5 items to cart', points: -5, category: 'boundary', correct: false },
+                    { id: 'ecd8', text: 'Test cart on devices made before 2000', points: -6, category: 'boundary', correct: false },
+                    { id: 'ecd9', text: 'Cart total with cryptocurrency values', points: -7, category: 'boundary', correct: false },
+                    { id: 'ecd10', text: 'Check if cart data is stored in cookies only', points: -8, category: 'security', correct: false },
+                    { id: 'ecd11', text: 'Verify cart uses Comic Sans font for prices', points: -4, category: 'security', correct: false },
+                    { id: 'ecd12', text: 'Test cart security during full moon', points: -10, category: 'security', correct: false }
                 ]
             }
         }
@@ -175,31 +205,46 @@ const testScenarios = {
             ],
             testCases: {
                 positive: [
-                    { id: 'p1', text: 'Successful payment with valid credit card', points: 15, essential: true },
-                    { id: 'p2', text: 'Successful PayPal payment', points: 12, essential: true },
-                    { id: 'p3', text: 'Process partial refund successfully', points: 20 },
-                    { id: 'p4', text: 'Handle multiple currency payments', points: 18 },
-                    { id: 'p5', text: 'Process recurring subscription payments', points: 22 }
+                    { id: 'p1', text: 'Successful payment with valid credit card', points: 15, essential: true, correct: true },
+                    { id: 'p2', text: 'Successful PayPal payment', points: 12, essential: true, correct: true },
+                    { id: 'p3', text: 'Process partial refund successfully', points: 20, correct: true },
+                    { id: 'p4', text: 'Handle multiple currency payments', points: 18, correct: true },
+                    { id: 'p5', text: 'Process recurring subscription payments', points: 22, correct: true }
                 ],
                 negative: [
-                    { id: 'n1', text: 'Payment with expired credit card', points: 18, essential: true },
-                    { id: 'n2', text: 'Payment with insufficient funds', points: 20, essential: true },
-                    { id: 'n3', text: 'Payment with invalid card number', points: 16, essential: true },
-                    { id: 'n4', text: 'Network timeout during payment processing', points: 25 },
-                    { id: 'n5', text: 'Payment gateway service unavailable', points: 22 }
+                    { id: 'n1', text: 'Payment with expired credit card', points: 18, essential: true, correct: true },
+                    { id: 'n2', text: 'Payment with insufficient funds', points: 20, essential: true, correct: true },
+                    { id: 'n3', text: 'Payment with invalid card number', points: 16, essential: true, correct: true },
+                    { id: 'n4', text: 'Network timeout during payment processing', points: 25, correct: true },
+                    { id: 'n5', text: 'Payment gateway service unavailable', points: 22, correct: true }
                 ],
                 boundary: [
-                    { id: 'b1', text: 'Payment amount at minimum threshold', points: 15 },
-                    { id: 'b2', text: 'Payment amount at maximum limit', points: 18 },
-                    { id: 'b3', text: 'Payment with amount having many decimal places', points: 20 },
-                    { id: 'b4', text: 'Refund amount exceeding original payment', points: 25, essential: true }
+                    { id: 'b1', text: 'Payment amount at minimum threshold', points: 15, correct: true },
+                    { id: 'b2', text: 'Payment amount at maximum limit', points: 18, correct: true },
+                    { id: 'b3', text: 'Payment with amount having many decimal places', points: 20, correct: true },
+                    { id: 'b4', text: 'Refund amount exceeding original payment', points: 25, essential: true, correct: true }
                 ],
                 security: [
-                    { id: 's1', text: 'Card data encryption at rest and in transit', points: 30, essential: true },
-                    { id: 's2', text: 'PCI DSS compliance verification', points: 35, essential: true },
-                    { id: 's3', text: 'Prevention of payment data logging', points: 28 },
-                    { id: 's4', text: 'Double-spending prevention', points: 32, essential: true },
-                    { id: 's5', text: 'Payment injection attack prevention', points: 30 }
+                    { id: 's1', text: 'Card data encryption at rest and in transit', points: 30, essential: true, correct: true },
+                    { id: 's2', text: 'PCI DSS compliance verification', points: 35, essential: true, correct: true },
+                    { id: 's3', text: 'Prevention of payment data logging', points: 28, correct: true },
+                    { id: 's4', text: 'Double-spending prevention', points: 32, essential: true, correct: true },
+                    { id: 's5', text: 'Payment injection attack prevention', points: 30, correct: true }
+                ],
+                // Wrong answer choices (distractors)
+                distractors: [
+                    { id: 'pcd1', text: 'Test payment button color changes on hover', points: -4, category: 'positive', correct: false },
+                    { id: 'pcd2', text: 'Verify payment form uses elegant fonts', points: -3, category: 'positive', correct: false },
+                    { id: 'pcd3', text: 'Check if payments work only on weekdays', points: -8, category: 'positive', correct: false },
+                    { id: 'pcd4', text: 'Test payment with future credit cards', points: -6, category: 'negative', correct: false },
+                    { id: 'pcd5', text: 'Verify error message font size is 14px', points: -3, category: 'negative', correct: false },
+                    { id: 'pcd6', text: 'Test payment with imaginary currencies', points: -9, category: 'negative', correct: false },
+                    { id: 'pcd7', text: 'Payment amount with exactly π decimal places', points: -7, category: 'boundary', correct: false },
+                    { id: 'pcd8', text: 'Test payments during solar eclipses', points: -8, category: 'boundary', correct: false },
+                    { id: 'pcd9', text: 'Payment processing on leap seconds', points: -10, category: 'boundary', correct: false },
+                    { id: 'pcd10', text: 'Check if payment data is stored in plain text', points: -12, category: 'security', correct: false },
+                    { id: 'pcd11', text: 'Verify payment gateway uses Comic Sans', points: -5, category: 'security', correct: false },
+                    { id: 'pcd12', text: 'Test payment security with magic spells', points: -15, category: 'security', correct: false }
                 ]
             }
         }
