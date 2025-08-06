@@ -719,8 +719,11 @@ function formatTime(seconds) {
 async function submitScore() {
     try {
         // Ensure score is a valid number
-        const finalScore = currentGame.score || 0;
-        console.log('Submitting score:', finalScore);
+        const finalScore = Number(currentGame.score) || 0;
+        console.log('Raw currentGame.score:', currentGame.score);
+        console.log('Converted finalScore:', finalScore);
+        console.log('Score type:', typeof finalScore);
+        console.log('Is valid number:', !isNaN(finalScore) && isFinite(finalScore));
         console.log('Firebase available:', !!window.firebaseGlobalLeaderboard);
         
         // Validate all required fields
@@ -736,12 +739,17 @@ async function submitScore() {
         console.log('Game details:', gameDetails);
 
         // Only submit if we have a valid score
-        if (finalScore <= 0) {
-            console.log('Score is 0 or invalid, not submitting to leaderboard');
+        if (finalScore <= 0 || isNaN(finalScore) || !isFinite(finalScore)) {
+            console.log('Score is invalid, not submitting to leaderboard:', finalScore);
             return;
         }
 
         if (window.firebaseGlobalLeaderboard) {
+            console.log('About to submit to Firebase:');
+            console.log('- Game:', 'guess-the-word');
+            console.log('- Score:', finalScore, 'Type:', typeof finalScore);
+            console.log('- Details:', JSON.stringify(gameDetails, null, 2));
+            
             const result = await window.firebaseGlobalLeaderboard.submitScore(
                 'guess-the-word',
                 finalScore,
