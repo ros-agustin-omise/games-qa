@@ -13,7 +13,9 @@ let currentGame = {
     timerInterval: null,
     startTime: null,
     totalCluesUsed: 0,
-    isPaused: false
+    isPaused: false,
+    usedWords: [],
+    availableWords: []
 };
 
 // Word database with clues
@@ -313,10 +315,25 @@ function startGame(difficulty) {
     currentGame.wordsGuessed = 0;
     currentGame.totalCluesUsed = 0;
     currentGame.startTime = Date.now();
+    currentGame.usedWords = [];
+    
+    // Set total rounds based on difficulty
+    const roundsPerDifficulty = {
+        'easy': 5,
+        'medium': 3,
+        'hard': 1
+    };
+    currentGame.totalRounds = roundsPerDifficulty[difficulty];
+    
+    // Initialize available words (copy of the word database for this difficulty)
+    currentGame.availableWords = [...wordDatabase[difficulty]];
     
     // Track game start
     if (window.analytics) {
-        window.analytics.trackGameStart('Guess the Word', { difficulty: difficulty });
+        window.analytics.trackGameStart('Guess the Word', { 
+            difficulty: difficulty,
+            total_rounds: currentGame.totalRounds
+        });
     }
     
     document.getElementById('gameSetup').classList.add('hidden');
@@ -331,12 +348,23 @@ function nextRound() {
         return;
     }
     
+    // Check if we have available words left
+    if (currentGame.availableWords.length === 0) {
+        // If no words left, end the game early
+        endGame();
+        return;
+    }
+    
     currentGame.currentRound++;
     currentGame.revealedClues = 0;
     
-    // Select random word from difficulty category
-    const words = wordDatabase[currentGame.difficulty];
-    currentGame.currentWord = words[Math.floor(Math.random() * words.length)];
+    // Select random word from available words (no repeats)
+    const randomIndex = Math.floor(Math.random() * currentGame.availableWords.length);
+    currentGame.currentWord = currentGame.availableWords[randomIndex];
+    
+    // Remove the selected word from available words and add to used words
+    currentGame.usedWords.push(currentGame.currentWord);
+    currentGame.availableWords.splice(randomIndex, 1);
     
     // Update UI
     updateGameDisplay();
