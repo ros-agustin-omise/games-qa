@@ -280,7 +280,15 @@ const wordDatabase = {
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Firebase Global Leaderboard
     if (window.firebaseGlobalLeaderboard) {
-        window.firebaseGlobalLeaderboard.init();
+        console.log('Firebase Global Leaderboard available');
+        // Check if init method exists before calling
+        if (typeof window.firebaseGlobalLeaderboard.init === 'function') {
+            window.firebaseGlobalLeaderboard.init();
+        } else {
+            console.log('Firebase Global Leaderboard init method not found, may already be initialized');
+        }
+    } else {
+        console.log('Firebase Global Leaderboard not available');
     }
     
     // Track page view
