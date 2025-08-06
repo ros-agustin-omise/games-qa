@@ -18,8 +18,8 @@ let currentGame = {
     availableWords: []
 };
 
-// Word database with clues
-const wordDatabase = {
+// Enhanced word database with more variety
+const baseWordDatabase = {
     easy: [
         {
             word: "HOUSE",
@@ -30,6 +30,61 @@ const wordDatabase = {
                 "Usually has a roof and walls",
                 "You might have a key to enter this",
                 "Rhymes with 'mouse'"
+            ]
+        },
+        {
+            word: "BEACH",
+            category: "Nature & Places",
+            clues: [
+                "Sandy area by the ocean",
+                "Popular vacation destination",
+                "Where waves meet the shore",
+                "People build sandcastles here",
+                "Often has lifeguards"
+            ]
+        },
+        {
+            word: "PIZZA",
+            category: "Food & Meals",
+            clues: [
+                "Round Italian food with toppings",
+                "Usually has cheese and tomato sauce",
+                "Cut into triangular slices",
+                "Popular delivery food",
+                "Often eaten at parties"
+            ]
+        },
+        {
+            word: "ROBOT",
+            category: "Technology",
+            clues: [
+                "Mechanical being that can move",
+                "Often seen in science fiction movies",
+                "Can be programmed to do tasks",
+                "Some look like humans",
+                "Made of metal and circuits"
+            ]
+        },
+        {
+            word: "DANCE",
+            category: "Arts & Activities",
+            clues: [
+                "Moving your body to music",
+                "Popular at weddings and parties",
+                "Can be ballet, hip-hop, or salsa",
+                "Performed on a stage or floor",
+                "Often done with a partner"
+            ]
+        },
+        {
+            word: "MAGIC",
+            category: "Entertainment",
+            clues: [
+                "Tricks that seem impossible",
+                "Performed by wizards or magicians",
+                "Often involves cards or rabbits",
+                "Makes things appear and disappear",
+                "Popular at birthday parties"
             ]
         },
         {
@@ -276,8 +331,59 @@ const wordDatabase = {
     ]
 };
 
+// Global word usage tracking across all games
+let globalUsedWords = {
+    easy: new Set(),
+    medium: new Set(),
+    hard: new Set()
+};
+
+// Dynamic word database that refreshes when needed
+let wordDatabase = {};
+
+// Initialize dynamic word database
+function initializeWordDatabase() {
+    wordDatabase = {
+        easy: [...baseWordDatabase.easy],
+        medium: [...baseWordDatabase.medium],
+        hard: [...baseWordDatabase.hard]
+    };
+}
+
+// Refresh word database when running low
+function refreshWordDatabase(difficulty) {
+    const usedCount = globalUsedWords[difficulty].size;
+    const totalWords = baseWordDatabase[difficulty].length;
+    
+    // If we've used more than 70% of words, reset the used words
+    if (usedCount > totalWords * 0.7) {
+        console.log(`Refreshing ${difficulty} word database - used ${usedCount}/${totalWords} words`);
+        globalUsedWords[difficulty].clear();
+        
+        // Add some variety by shuffling the database
+        wordDatabase[difficulty] = [...baseWordDatabase[difficulty]].sort(() => Math.random() - 0.5);
+    }
+}
+
+// Get available words for difficulty (excluding globally used ones)
+function getAvailableWords(difficulty) {
+    refreshWordDatabase(difficulty);
+    
+    return wordDatabase[difficulty].filter(word => 
+        !globalUsedWords[difficulty].has(word.word)
+    );
+}
+
+// Mark word as used globally
+function markWordAsUsed(difficulty, word) {
+    globalUsedWords[difficulty].add(word);
+    console.log(`Marked ${word} as used. Total used in ${difficulty}: ${globalUsedWords[difficulty].size}`);
+}
+
 // Initialize game
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dynamic word database
+    initializeWordDatabase();
     // Initialize Firebase Global Leaderboard
     if (window.firebaseGlobalLeaderboard) {
         console.log('Firebase Global Leaderboard available');
@@ -343,8 +449,14 @@ function startGame(difficulty) {
     };
     currentGame.totalRounds = roundsPerDifficulty[difficulty];
     
-    // Initialize available words (copy of the word database for this difficulty)
-    currentGame.availableWords = [...wordDatabase[difficulty]];
+    // Initialize available words (get fresh words excluding globally used ones)
+    currentGame.availableWords = getAvailableWords(difficulty);
+    
+    if (currentGame.availableWords.length === 0) {
+        console.log('No available words left, refreshing database');
+        globalUsedWords[difficulty].clear();
+        currentGame.availableWords = getAvailableWords(difficulty);
+    }
     
     console.log('Game started - Initial score:', currentGame.score);
     
@@ -385,6 +497,9 @@ function nextRound() {
     // Remove the selected word from available words and add to used words
     currentGame.usedWords.push(currentGame.currentWord);
     currentGame.availableWords.splice(randomIndex, 1);
+    
+    // Mark word as used globally to prevent it in future games
+    markWordAsUsed(currentGame.difficulty, currentGame.currentWord.word);
     
     // Update UI
     updateGameDisplay();
@@ -763,6 +878,11 @@ async function submitScore() {
             
             if (result && result.submitted) {
                 console.log('Score submitted to global leaderboard');
+                
+                // Show leaderboard modal after successful submission
+                setTimeout(() => {
+                    showGameLeaderboard();
+                }, 1000);
             }
         } else if (window.globalLeaderboard) {
             console.log('Using fallback leaderboard');
