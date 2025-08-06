@@ -30,8 +30,8 @@ function showReportIssue() {
                         <option value="number-guessing">🎯 Number Guessing</option>
                         <option value="word-scramble">📝 Word Scramble</option>
                         <option value="rock-paper-scissors">✂️ Rock Paper Scissors</option>
-                        <option value="spot-the-difference">🔍 Spot the Difference</option>
                         <option value="test-case-designer">🧪 Test Case Designer</option>
+                        <option value="guess-the-word">🔤 Guess the Word</option>
                     </select>
                 </div>
                 
@@ -270,12 +270,12 @@ const GameUtils = {
 // Show all leaderboards
 function showAllLeaderboards() {
     const games = [
-        'spot-the-difference',
         'memory-match', 
         'rock-paper-scissors',
         'number-guessing',
         'word-scramble',
-        'test-case-designer'
+        'test-case-designer',
+        'guess-the-word'
     ];
     
     const modal = document.createElement('div');
