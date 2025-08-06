@@ -1682,6 +1682,7 @@ function calculateScore() {
     let selectedCorrect = 0;
     let missedCases = [];
     let customTestCaseScore = 0;
+    let wrongAnswerPenalty = 0;
     
     // Calculate score for selected predefined test cases
     currentGame.selectedTestCases.forEach(selected => {
@@ -1690,6 +1691,14 @@ function calculateScore() {
             score += testCase.points;
             selectedCorrect++;
             totalPossible += testCase.points;
+        } else {
+            // This might be a wrong answer (distractor)
+            if (selected.correct === false && feature.testCases.distractors) {
+                const distractor = feature.testCases.distractors.find(d => d.id === selected.id);
+                if (distractor) {
+                    wrongAnswerPenalty += Math.abs(distractor.points); // Deduct penalty points
+                }
+            }
         }
     });
     
@@ -1729,6 +1738,9 @@ function calculateScore() {
     const hintPenalty = currentGame.hintsUsed * 5;
     score = Math.max(0, score - hintPenalty);
     
+    // Apply wrong answer penalty
+    score = Math.max(0, score - wrongAnswerPenalty);
+    
     currentGame.score = score;
     // Note: Don't add to totalScore here as custom test cases are already added
     
@@ -1741,6 +1753,7 @@ function calculateScore() {
         customTestCount: currentGame.customTestCases.length,
         essentialMissed,
         missedCases,
+        wrongAnswerPenalty,
         coverage: Math.round((selectedCorrect / allTestCases.length) * 100)
     };
 }
