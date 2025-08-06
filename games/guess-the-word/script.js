@@ -317,13 +317,23 @@ function setupInputListeners() {
 }
 
 function startGame(difficulty) {
-    currentGame.difficulty = difficulty;
-    currentGame.currentRound = 0;
-    currentGame.score = 0;
-    currentGame.wordsGuessed = 0;
-    currentGame.totalCluesUsed = 0;
-    currentGame.startTime = Date.now();
-    currentGame.usedWords = [];
+    // Reset all game state with proper defaults
+    currentGame = {
+        difficulty: difficulty,
+        currentRound: 0,
+        totalRounds: 0,
+        score: 0, // Explicitly initialize score
+        wordsGuessed: 0,
+        currentWord: null,
+        revealedClues: 0,
+        timeLeft: 60,
+        timerInterval: null,
+        startTime: Date.now(),
+        totalCluesUsed: 0,
+        isPaused: false,
+        usedWords: [],
+        availableWords: []
+    };
     
     // Set total rounds based on difficulty
     const roundsPerDifficulty = {
@@ -335,6 +345,8 @@ function startGame(difficulty) {
     
     // Initialize available words (copy of the word database for this difficulty)
     currentGame.availableWords = [...wordDatabase[difficulty]];
+    
+    console.log('Game started - Initial score:', currentGame.score);
     
     // Track game start
     if (window.analytics) {
@@ -706,24 +718,33 @@ function formatTime(seconds) {
 
 async function submitScore() {
     try {
-        console.log('Submitting score:', currentGame.score);
+        // Ensure score is a valid number
+        const finalScore = currentGame.score || 0;
+        console.log('Submitting score:', finalScore);
         console.log('Firebase available:', !!window.firebaseGlobalLeaderboard);
         
+        // Validate all required fields
         const gameDetails = {
-            difficulty: currentGame.difficulty,
-            words_guessed: currentGame.wordsGuessed,
-            total_rounds: currentGame.totalRounds,
-            accuracy: Math.round((currentGame.wordsGuessed / currentGame.totalRounds) * 100),
-            clues_used: currentGame.totalCluesUsed,
-            time_taken: Math.floor((Date.now() - currentGame.startTime) / 1000)
+            difficulty: currentGame.difficulty || 'easy',
+            words_guessed: currentGame.wordsGuessed || 0,
+            total_rounds: currentGame.totalRounds || 1,
+            accuracy: Math.round(((currentGame.wordsGuessed || 0) / (currentGame.totalRounds || 1)) * 100),
+            clues_used: currentGame.totalCluesUsed || 0,
+            time_taken: Math.floor((Date.now() - (currentGame.startTime || Date.now())) / 1000)
         };
 
         console.log('Game details:', gameDetails);
 
+        // Only submit if we have a valid score
+        if (finalScore <= 0) {
+            console.log('Score is 0 or invalid, not submitting to leaderboard');
+            return;
+        }
+
         if (window.firebaseGlobalLeaderboard) {
             const result = await window.firebaseGlobalLeaderboard.submitScore(
                 'guess-the-word',
-                currentGame.score,
+                finalScore,
                 gameDetails
             );
             
@@ -736,7 +757,7 @@ async function submitScore() {
             console.log('Using fallback leaderboard');
             await window.globalLeaderboard.submitScore(
                 'guess-the-word',
-                currentGame.score,
+                finalScore,
                 gameDetails
             );
         } else {
